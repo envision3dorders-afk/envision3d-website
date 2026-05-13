@@ -23,35 +23,34 @@ return (
     <h1>Envision3D</h1>
     <p>3D Printing Services</p>
 
-      <h2>Products</h2>
-      {products.map((p) => (
-        <div
-          key={p.id}
-          onClick={() => setSelectedProduct(p)}
-          style={{ cursor: "pointer", marginBottom: "10px" }}
-        >
-          <h3>{p.name}</h3>
-          <p>{p.price}</p>
-        </div>
-      ))}
+    <h2>Products</h2>
+    {products.map((p) => (
+      <div
+        key={p.id}
+        onClick={() => setSelectedProduct(p)}
+        style={{ cursor: "pointer", marginBottom: "10px" }}
+      >
+        <h3>{p.name}</h3>
+        <p>{p.price}</p>
+      </div>
+    ))}
 
-      {selectedProduct && (
-        <form onSubmit={handleSubmit}>
-          <h2>Order: {selectedProduct.name}</h2>
+    {selectedProduct && (
+      <form onSubmit={handleSubmit}>
+        <h2>Order: {selectedProduct.name}</h2>
 
-          <input name="name" placeholder="Your Name" required /><br /><br />
-          <input name="email" type="email" placeholder="Your Email" required /><br /><br />
-          <input name="material" placeholder="Material" /><br /><br />
-          <input name="color" placeholder="Color" /><br /><br />
-          <input name="quantity" type="number" defaultValue="1" /><br /><br />
+        <input name="name" placeholder="Your Name" required /><br /><br />
+        <input name="email" type="email" placeholder="Your Email" required /><br /><br />
+        <input name="material" placeholder="Material" /><br /><br />
+        <input name="color" placeholder="Color" /><br /><br />
+        <input name="quantity" type="number" defaultValue="1" /><br /><br />
 
-          <textarea name="details" placeholder="Describe your request" /><br /><br />
+        <textarea name="details" placeholder="Describe your request" /><br /><br />
 
-          <input type="hidden" name="product" value={selectedProduct.name} />
+        <input type="hidden" name="product" value={selectedProduct.name} />
 
-          <button type="submit">Submit Order</button>
-        </form>
-      )}
-    </div>
-  );
-}
+        <button type="submit">Submit Order</button>
+      </form>
+    )}
+  </div>
+);
