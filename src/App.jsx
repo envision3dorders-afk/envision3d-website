@@ -1,24 +1,27 @@
 import { useState } from "react";
+import { useForm } from "@formspree/react";
 
 export default function App() {
   const [selectedProduct, setSelectedProduct] = useState(null);
-  
-const handleSubmit = (e) => {
-  e.preventDefault();
-  alert("Form submitted (test)");
-};
+  const [state, handleSubmit] = useForm("xgodnrrl");
 
-  const products = [
-    { id: 1, name: "Custom 3D Print", price: "Quote-Based" },
-    { id: 2, name: "Phone Stand", price: "R120" },
-    { id: 3, name: "Miniature Figurine", price: "R85" },
-  ];
+  if (!state) {
+    return <p>Loading...</p>;
+  }
 
+  if (state.succeeded) {
+    return (
+      <div style={{ padding: "20px" }}>
+        <h1>✅ Order Received</h1>
+        <p>We will contact you from orders@envision3d.co.za</p>
+      </div>
+    );
+  }
 
-  return (
-    <div style={{ padding: "20px" }}>
-      <h1>Envision3D</h1>
-      <p>3D Printing Services</p>
+return (
+  <div style={{ padding: "20px" }}>
+    <h1>Envision3D</h1>
+    <p>3D Printing Services</p>
 
       <h2>Products</h2>
       {products.map((p) => (
