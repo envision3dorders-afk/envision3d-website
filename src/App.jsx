@@ -11,26 +11,25 @@ export default function App() {
       id: 1,
       name: "Custom 3D Print",
       price: "Quote-Based",
-      embed: null,
+      image: null,
       link: null,
     },
     {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      embed: "https://www.thingiverse.com/thing:1952405/embed",
-      link: "https://www.thingiverse.com/thing:1952405",
+      image: "https://via.placeholder.com/250",
+      link: "https://makerworld.com/",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      embed: "https://www.thingiverse.com/thing:763622/embed",
-      link: "https://www.thingiverse.com/thing:763622",
+      image: "https://via.placeholder.com/250",
+      link: "https://www.crealitycloud.com/",
     },
   ];
 
-  // Filter products
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -85,46 +84,32 @@ export default function App() {
               background: "#fff",
             }}
           >
+            {p.image && (
+              <img
+                src={p.image}
+                alt={p.name}
+                style={{ width: "100%", marginBottom: "10px" }}
+              />
+            )}
             <h3>{p.name}</h3>
             <p>{p.price}</p>
           </div>
         ))}
       </div>
 
-      {/* MODEL PREVIEW */}
+      {/* MODEL INFO */}
       {selectedProduct && (
-        <div
-          style={{
-            marginTop: "30px",
-            border: "1px solid #ddd",
-            padding: "15px",
-            borderRadius: "10px",
-          }}
-        >
-          <h2>Preview: {selectedProduct.name}</h2>
+        <div style={{ marginTop: "30px" }}>
+          <h2>{selectedProduct.name}</h2>
 
-          {selectedProduct.embed ? (
-            <iframe
-              src={selectedProduct.embed}
-              width="100%"
-              height="400"
-              style={{ border: "none", background: "#f0f0f0" }}
-              title="3D Model Preview"
-            ></iframe>
-          ) : (
-            <p>This is a custom print. Provide your design details below.</p>
-          )}
-
-          {/* FALLBACK LINK */}
           {selectedProduct.link && (
-            <p style={{ marginTop: "10px" }}>
-              Can’t see the model?{" "}
+            <p>
               <a
                 href={selectedProduct.link}
                 target="_blank"
                 rel="noopener noreferrer"
               >
-                View on Thingiverse
+                View Model
               </a>
             </p>
           )}
@@ -143,15 +128,25 @@ export default function App() {
               maxWidth: "400px",
             }}
           >
-            <input
-              name="name"
-              placeholder="Your Name"
-              required
-              style={{ marginBottom: "10px", padding: "8px" }}
-            />
+            <input name="name" placeholder="Your Name" required />
+            <input name="email" type="email" placeholder="Your Email" required />
+            <input name="material" placeholder="Material" />
+            <input name="color" placeholder="Color" />
+            <input name="quantity" type="number" defaultValue="1" />
+            <textarea name="details" placeholder="Describe your request" />
 
-            <input
-              name="email"
-              type="email"
-              placeholder="Your Email"
-              required
+            <input type="hidden" name="product" value={selectedProduct.name} />
+
+            <button type="submit" disabled={state.submitting}>
+              {state.submitting ? "Submitting..." : "Submit Order"}
+            </button>
+          </div>
+        </form>
+      )}
+
+      <p style={{ marginTop: "40px" }}>
+        Contact: orders@envision3d.co.za
+      </p>
+    </div>
+  );
+}
