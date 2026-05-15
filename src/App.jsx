@@ -27,7 +27,7 @@ export default function App() {
     },
   ];
 
-  // Filter products
+  // Filter products based on search
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -35,7 +35,7 @@ export default function App() {
   // Loading safeguard
   if (!state) return <p>Loading...</p>;
 
-  // Success screen
+  // Success message after form submission
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", fontFamily: "Arial" }}>
@@ -91,7 +91,7 @@ export default function App() {
       </div>
 
       {/* MODEL PREVIEW */}
-      {selectedProduct && selectedProduct.embed && (
+      {selectedProduct && (
         <div
           style={{
             marginTop: "30px",
@@ -102,25 +102,31 @@ export default function App() {
         >
           <h2>Preview: {selectedProduct.name}</h2>
 
-          <iframe
-            src={selectedProduct.embed}
-            width="100%"
-            height="400"
-            style={{ border: "none" }}
-            title="3D Model Preview"
-          ></iframe>
+          {selectedProduct.embed ? (
+            <iframe
+              src={selectedProduct.embed}
+              width="100%"
+              height="400"
+              style={{ border: "none" }}
+              title="3D Model"
+            ></iframe>
+          ) : (
+            <p>This is a custom print. Provide details below.</p>
+          )}
 
           {/* FALLBACK LINK */}
-          <p style={{ marginTop: "10px" }}>
-            If the preview doesn’t load:
-          </p>
-          <a
-            href={selectedProduct.embed.replace("/embed", "")}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            View on Thingiverse
-          </a>
+          {selectedProduct.embed && (
+            <p style={{ marginTop: "10px" }}>
+              Can’t see the model?{" "}
+              <a
+                href={selectedProduct.embed.replace("/embed", "")}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
+                View on Thingiverse
+              </a>
+            </p>
+          )}
         </div>
       )}
 
