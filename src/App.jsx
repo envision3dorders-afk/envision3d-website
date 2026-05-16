@@ -18,24 +18,27 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image: "https://via.placeholder.com/250",
-      link: "https://makerworld.com/",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image: "https://via.placeholder.com/250",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
 
+  // Filter products based on search
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // Loading safeguard
   if (!state) return <p>Loading...</p>;
 
+  // Success screen
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", fontFamily: "Arial" }}>
@@ -74,34 +77,40 @@ export default function App() {
         {filteredProducts.map((p) => (
           <div
             key={p.id}
-            onClick={() => setSelectedProduct(p)}
             style={{
-              cursor: "pointer",
               border: "1px solid #ddd",
               borderRadius: "10px",
               padding: "15px",
               width: "250px",
               background: "#fff",
+              cursor: "pointer",
             }}
+            onClick={() => setSelectedProduct(p)}
           >
             {p.image && (
               <img
                 src={p.image}
                 alt={p.name}
-                style={{ width: "100%", marginBottom: "10px" }}
+                style={{
+                  width: "100%",
+                  borderRadius: "5px",
+                  marginBottom: "10px",
+                }}
               />
             )}
+
             <h3>{p.name}</h3>
             <p>{p.price}</p>
           </div>
         ))}
       </div>
 
-      {/* MODEL INFO */}
+      {/* SELECTED PRODUCT */}
       {selectedProduct && (
         <div style={{ marginTop: "30px" }}>
           <h2>{selectedProduct.name}</h2>
 
+          {/* VIEW MODEL LINK */}
           {selectedProduct.link && (
             <p>
               <a
@@ -126,25 +135,49 @@ export default function App() {
               display: "flex",
               flexDirection: "column",
               maxWidth: "400px",
+              gap: "10px",
             }}
           >
             <input name="name" placeholder="Your Name" required />
             <input name="email" type="email" placeholder="Your Email" required />
-            <input name="material" placeholder="Material" />
+            <input name="material" placeholder="Material (PLA, ABS, Resin...)" />
             <input name="color" placeholder="Color" />
             <input name="quantity" type="number" defaultValue="1" />
-            <textarea name="details" placeholder="Describe your request" />
 
-            <input type="hidden" name="product" value={selectedProduct.name} />
+            {/* ✅ FILE UPLOAD (NEW FEATURE) */}
+            <input type="file" name="file" />
 
-            <button type="submit" disabled={state.submitting}>
+            <textarea
+              name="details"
+              placeholder="Describe your request"
+            />
+
+            <input
+              type="hidden"
+              name="product"
+              value={selectedProduct.name}
+            />
+
+            <button
+              type="submit"
+              disabled={state.submitting}
+              style={{
+                padding: "10px",
+                background: "#0070f3",
+                color: "#fff",
+                border: "none",
+                borderRadius: "5px",
+                cursor: "pointer",
+              }}
+            >
               {state.submitting ? "Submitting..." : "Submit Order"}
             </button>
           </div>
         </form>
       )}
 
-      <p style={{ marginTop: "40px" }}>
+      {/* CONTACT */}
+      <p style={{ marginTop: "40px", fontSize: "14px", color: "#555" }}>
         Contact: orders@envision3d.co.za
       </p>
     </div>
