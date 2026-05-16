@@ -18,27 +18,26 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
       link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
 
-  // Filter products based on search
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // Loading safeguard
   if (!state) return <p>Loading...</p>;
 
-  // Success screen
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", fontFamily: "Arial" }}>
@@ -77,15 +76,22 @@ export default function App() {
         {filteredProducts.map((p) => (
           <div
             key={p.id}
+            onClick={() => setSelectedProduct(p)}
             style={{
+              cursor: "pointer",
               border: "1px solid #ddd",
               borderRadius: "10px",
               padding: "15px",
               width: "250px",
               background: "#fff",
-              cursor: "pointer",
+              transition: "0.2s",
             }}
-            onClick={() => setSelectedProduct(p)}
+            onMouseEnter={(e) =>
+              (e.currentTarget.style.transform = "scale(1.03)")
+            }
+            onMouseLeave={(e) =>
+              (e.currentTarget.style.transform = "scale(1)")
+            }
           >
             {p.image && (
               <img
@@ -93,7 +99,7 @@ export default function App() {
                 alt={p.name}
                 style={{
                   width: "100%",
-                  borderRadius: "5px",
+                  borderRadius: "8px",
                   marginBottom: "10px",
                 }}
               />
@@ -110,13 +116,14 @@ export default function App() {
         <div style={{ marginTop: "30px" }}>
           <h2>{selectedProduct.name}</h2>
 
-          {/* VIEW MODEL LINK */}
+          {/* MODEL LINK */}
           {selectedProduct.link && (
             <p>
               <a
                 href={selectedProduct.link}
                 target="_blank"
                 rel="noopener noreferrer"
+                style={{ color: "#0070f3" }}
               >
                 View Model
               </a>
@@ -140,18 +147,25 @@ export default function App() {
           >
             <input name="name" placeholder="Your Name" required />
             <input name="email" type="email" placeholder="Your Email" required />
-            <input name="material" placeholder="Material (PLA, ABS, Resin...)" />
+            <input
+              name="material"
+              placeholder="Material (PLA, ABS, Resin...)"
+            />
             <input name="color" placeholder="Color" />
             <input name="quantity" type="number" defaultValue="1" />
 
-            {/* ✅ FILE UPLOAD (NEW FEATURE) */}
-            <input type="file" name="file" />
+            {/* FILE UPLOAD */}
+            <label style={{ fontSize: "14px" }}>
+              Upload your 3D file (STL/OBJ):
+            </label>
+            <input type="file" name="file" accept=".stl,.obj" />
 
             <textarea
               name="details"
               placeholder="Describe your request"
-            />
+            ></textarea>
 
+            {/* Hidden field */}
             <input
               type="hidden"
               name="product"
@@ -177,9 +191,3 @@ export default function App() {
       )}
 
       {/* CONTACT */}
-      <p style={{ marginTop: "40px", fontSize: "14px", color: "#555" }}>
-        Contact: orders@envision3d.co.za
-      </p>
-    </div>
-  );
-}
