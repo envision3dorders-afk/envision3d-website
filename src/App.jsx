@@ -60,9 +60,13 @@ export default function App() {
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
+
+        <h2 style={{ color: "#0070f3" }}>{orderRef}</h2>
+
+        <p>Please use the above reference when making payment.</p>
+
         <p>
-          Please complete payment using your reference:
-          <strong> {orderRef}</strong>
+          Once payment is received, we will confirm your order and begin printing.
         </p>
       </div>
     );
@@ -72,14 +76,16 @@ export default function App() {
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
       {/* ✅ HEADER */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        alignItems: "center",
-        padding: "10px 20px",
-        background: "#fff",
-        borderBottom: "1px solid #ddd"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          alignItems: "center",
+          padding: "10px 20px",
+          background: "#fff",
+          borderBottom: "1px solid #ddd",
+        }}
+      >
         <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
           Envision3D
         </h2>
@@ -88,15 +94,19 @@ export default function App() {
           placeholder="Search models..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{ flex: 1, margin: "0 20px", padding: "10px", maxWidth: "500px" }}
+          style={{
+            flex: 1,
+            margin: "0 20px",
+            padding: "10px",
+            maxWidth: "500px",
+          }}
         />
 
         <button onClick={() => setView("cart")}>
           Cart ({cart.length})
         </button>
 
-        {/* ✅ FIXED LOGO */}
-        <img src={logo} alt="Logo" style={{ width: "50px" }} />
+        <img src={logo} alt="Logo" style={{ height: "40px" }} />
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -106,28 +116,31 @@ export default function App() {
 
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
             {filteredProducts.map((p) => (
-              <div key={p.id} style={{
-                width: "250px",
-                background: "#fff",
-                borderRadius: "10px",
-                padding: "15px"
-              }}>
-
-                {/* ✅ FIXED IMAGE */}
+              <div
+                key={p.id}
+                style={{
+                  width: "250px",
+                  background: "#fff",
+                  borderRadius: "10px",
+                  padding: "15px",
+                }}
+              >
                 {p.image ? (
                   <img
                     src={p.image}
                     alt={p.name}
-                    style={{ width: "100%", borderRadius: "5px", marginBottom: "10px" }}
+                    style={{ width: "100%", marginBottom: "10px" }}
                   />
                 ) : (
-                  <div style={{
-                    height: "140px",
-                    background: "#eee",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center"
-                  }}>
+                  <div
+                    style={{
+                      height: "140px",
+                      background: "#eee",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                    }}
+                  >
                     Custom Upload
                   </div>
                 )}
@@ -159,7 +172,10 @@ export default function App() {
             <>
               {cart.map((item, index) => (
                 <div key={index}>
-                  {item.name} - {typeof item.price === "number" ? `R${item.price}` : item.price}
+                  {item.name} -{" "}
+                  {typeof item.price === "number"
+                    ? `R${item.price}`
+                    : item.price}
 
                   <button onClick={() => removeFromCart(index)}>
                     Remove
@@ -187,18 +203,35 @@ export default function App() {
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
+          <h3>Order Summary</h3>
           {cart.map((item, i) => (
             <p key={i}>
-              {item.name} - {typeof item.price === "number" ? `R${item.price}` : item.price}
+              {item.name} -{" "}
+              {typeof item.price === "number"
+                ? `R${item.price}`
+                : item.price}
             </p>
           ))}
 
           <h3>Total: R{total}</h3>
 
+          {/* ✅ PAYMENT DETAILS */}
           <h3>Payment Instructions</h3>
+
           <p><strong>Bank:</strong> ABSA</p>
-          <p><strong>Account:</strong> YOUR ACCOUNT NUMBER</p>
-          <p><strong>Reference:</strong> {orderRef}</p>
+          <p><strong>Account Name:</strong> AJ Rautenbach</p>
+          <p><strong>Account Number:</strong> 9377967059</p>
+          <p><strong>Branch Code:</strong> 632005</p>
+
+          <h2 style={{ color: "#0070f3" }}>{orderRef}</h2>
+
+          <p style={{ color: "red", fontWeight: "bold" }}>
+            ⚠️ Use the exact reference above when making payment.
+          </p>
+
+          <p>
+            Once payment is received, we will process and print your order.
+          </p>
 
           <form onSubmit={handleSubmit}>
             <input name="name" placeholder="Your Name" required /><br /><br />
@@ -213,3 +246,4 @@ export default function App() {
     </div>
   );
 }
+``
