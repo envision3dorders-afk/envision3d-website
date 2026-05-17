@@ -6,7 +6,7 @@ import logo from "./assets/logo-circle.jpeg";
 export default function App() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState([]);
-  const [view, setView] = useState("products"); // ✅ NEW
+  const [view, setView] = useState("products");
   const [state, handleSubmit] = useForm("xgodnrrl");
 
   const products = [
@@ -21,14 +21,16 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand for smartphones",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
       description: "Detailed miniature for collectors",
     },
   ];
@@ -94,7 +96,7 @@ export default function App() {
         {logo}
       </div>
 
-      {/* ✅ PRODUCTS VIEW */}
+      {/* ✅ PRODUCTS */}
       {view === "products" && (
         <div style={{ padding: "20px" }}>
           <h2>Products</h2>
@@ -132,7 +134,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ CART VIEW */}
+      {/* ✅ CART */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
           <h2>🛒 Your Cart</h2>
@@ -164,12 +166,11 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ CHECKOUT VIEW */}
+      {/* ✅ CHECKOUT */}
       {view === "checkout" && (
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
-          <h3>Order Summary</h3>
           {cart.map((item, i) => (
             <p key={i}>
               {item.name} -{" "}
