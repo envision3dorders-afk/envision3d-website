@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ IMPORT IMAGES
 import banner from "./assets/banner.jpeg";
 import logo from "./assets/logo.jpeg";
 
@@ -36,7 +35,6 @@ export default function App() {
     },
   ];
 
-  // ✅ FIX: prevents products disappearing when search is empty
   const filteredProducts =
     search.trim() === ""
       ? products
@@ -46,11 +44,10 @@ export default function App() {
 
   if (!state) return <p>Loading...</p>;
 
-  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     return (
-      <div style={{ padding: "20px", textAlign: "center", fontFamily: "Arial" }}>
-        <img src={logo} alt="logo" style={{ width: "180px" }} />
+      <div style={{ textAlign: "center", padding: "20px" }}>
+        {logo}
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -60,23 +57,42 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial" }}>
       
-      {/* ✅ HEADER */}
-      <div style={{ textAlign: "center", padding: "15px" }}>
-        <img src={logo} alt="logo" style={{ width: "180px" }} />
-        <p style={{ marginTop: "5px" }}>3D Printing Services</p>
-      </div>
+      {/* ✅ HERO SECTION (COMBINED LOGO + BANNER) */}
+      <div style={{ position: "relative", width: "100%", height: "320px" }}>
 
-      {/* ✅ BANNER (FIXED CLEAN DISPLAY) */}
-      <img
-        src={banner}
-        alt="banner"
-        style={{
-          width: "100%",
-          height: "300px",
-          objectFit: "cover",
-          display: "block",
-        }}
-      />
+        {/* 🎨 Banner */}
+        {banner}
+
+        {/* 🎨 Dark overlay for readability */}
+        <div
+          style={{
+            position: "absolute",
+            top: 0,
+            left: 0,
+            width: "100%",
+            height: "100%",
+            backgroundColor: "rgba(0,0,0,0.3)",
+          }}
+        />
+
+        {/* ✅ Logo + Text */}
+        <div
+          style={{
+            position: "absolute",
+            top: "50%",
+            left: "50%",
+            transform: "translate(-50%, -50%)",
+            textAlign: "center",
+            color: "#fff",
+          }}
+        >
+          {logo}
+
+          <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+            3D Printing Services
+          </p>
+        </div>
+      </div>
 
       {/* ✅ MAIN CONTENT */}
       <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
@@ -108,15 +124,10 @@ export default function App() {
                 padding: "10px",
                 cursor: "pointer",
                 background: "#fff",
-                transition: "0.2s",
               }}
             >
               {p.image && (
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  style={{ width: "100%", borderRadius: "5px" }}
-                />
+                {p.image}
               )}
 
               <h3>{p.name}</h3>
@@ -125,17 +136,13 @@ export default function App() {
           ))}
         </div>
 
-        {/* PRODUCT DETAILS */}
+        {/* SELECTED PRODUCT */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
 
             {selectedProduct.link && (
-              <a
-                href={selectedProduct.link}
-                target="_blank"
-                rel="noopener noreferrer"
-              >
+              {selectedProduct.link}
                 View Model
               </a>
             )}
@@ -174,4 +181,3 @@ export default function App() {
     </div>
   );
 }
-``
