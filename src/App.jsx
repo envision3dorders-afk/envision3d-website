@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
+// ✅ Images
 import banner from "./assets/banner.jpeg";
 import logo from "./assets/logo.jpeg";
 
@@ -21,18 +22,21 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
       link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
 
+  // ✅ Safe filtering (no disappearing products)
   const filteredProducts =
     search.trim() === ""
       ? products
@@ -42,11 +46,11 @@ export default function App() {
 
   if (!state) return <p>Loading...</p>;
 
+  // ✅ Success message
   if (state.succeeded) {
     return (
-      <div style={{ padding: "20px", textAlign: "center" }}>
-        <img src={logo} alt="logo" style={{ width: "200px" }} />
-
+      <div style={{ padding: "20px", textAlign: "center", fontFamily: "Arial" }}>
+        <img src={logo} alt="Logo" style={{ width: "200px" }} />
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -56,22 +60,28 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial" }}>
 
-      {/* HEADER */}
+      {/* ✅ HEADER */}
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <img src={logo} alt="logo" style={{ width: "200px" }} />
+        <img src={logo} alt="Logo" style={{ width: "200px" }} />
         <p style={{ marginTop: "10px" }}>3D Printing Services</p>
       </div>
 
-      {/* BANNER */}
-      <img
-        src={banner}
-        alt="banner"
-        style={{ width: "100%", display: "block" }}
-      />
+      {/* ✅ BANNER */}
+      <div style={{ width: "100%" }}>
+        <img
+          src={banner}
+          alt="Banner"
+          style={{
+            width: "100%",
+            height: "auto",
+            display: "block",
+          }}
+        />
+      </div>
 
-      {/* MAIN */}
+      {/* ✅ MAIN CONTENT */}
       <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
-        
+
         {/* SEARCH */}
         <input
           placeholder="Search models..."
@@ -115,20 +125,24 @@ export default function App() {
           ))}
         </div>
 
-        {/* SELECTED */}
+        {/* SELECTED PRODUCT */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
 
             {selectedProduct.link && (
-              <a href={selectedProduct.link} target="_blank" rel="noopener noreferrer">
+              <a
+                href={selectedProduct.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Model
               </a>
             )}
           </div>
         )}
 
-        {/* FORM */}
+        {/* ORDER FORM */}
         {selectedProduct && (
           <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
             <h2>Order</h2>
@@ -152,6 +166,7 @@ export default function App() {
           </form>
         )}
 
+        {/* CONTACT */}
         <p style={{ marginTop: "40px" }}>
           Contact: orders@envision3d.co.za
         </p>
