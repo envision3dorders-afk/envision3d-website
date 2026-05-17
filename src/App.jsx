@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ Use your final combined image
+// ✅ Final hero image
 import hero from "./assets/hero.jpeg";
 
 export default function App() {
@@ -58,14 +58,14 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial" }}>
 
-      {/* ✅ HERO IMAGE (FINAL CLEAN VERSION) */}
+      {/* ✅ HERO IMAGE (FIXED HEIGHT BANNER) */}
       <img
         src={hero}
-        alt="Envision3D Hero Banner"
+        alt="Envision3D Hero"
         style={{
           width: "100%",
-          height: "auto",
-          display: "block",
+          height: "300px",       // ✅ Controls banner height
+          objectFit: "cover",    // ✅ Crops nicely instead of stretching
         }}
       />
 
@@ -112,10 +112,7 @@ export default function App() {
                 <img
                   src={p.image}
                   alt={p.name}
-                  style={{
-                    width: "100%",
-                    borderRadius: "5px",
-                  }}
+                  style={{ width: "100%", borderRadius: "5px" }}
                 />
               )}
 
