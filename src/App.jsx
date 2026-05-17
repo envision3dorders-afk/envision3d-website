@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ Use your actual file names (.jpeg)
 import banner from "./assets/banner.jpeg";
 import logo from "./assets/logo.jpeg";
 
@@ -36,17 +35,20 @@ export default function App() {
     },
   ];
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  // ✅ FIX: Only filter if search has text
+  const filteredProducts =
+    search.trim() === ""
+      ? products
+      : products.filter((p) =>
+          p.name.toLowerCase().includes(search.toLowerCase())
+        );
 
   if (!state) return <p>Loading...</p>;
 
-  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     return (
-      <div style={{ padding: "20px", fontFamily: "Arial", textAlign: "center" }}>
-        <img src={logo} alt="logo" style={{ maxWidth: "250px" }} />
+      <div style={{ padding: "20px", textAlign: "center" }}>
+        {logo}
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -58,65 +60,47 @@ export default function App() {
       
       {/* ✅ HEADER */}
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <img src={logo} alt="logo" style={{ maxWidth: "250px" }} />
+        {logo}
         <p>3D Printing Services</p>
       </div>
 
       {/* ✅ BANNER */}
-      <img
-        src={banner}
-        alt="banner"
-        style={{ width: "100%", maxHeight: "300px", objectFit: "cover" }}
-      />
+      {banner}
 
-      {/* ✅ MAIN CONTENT */}
-      <div
-        style={{
-          padding: "20px",
-          maxWidth: "900px",
-          margin: "0 auto",
-        }}
-      >
+      {/* ✅ MAIN */}
+      <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
+        
         {/* SEARCH */}
         <input
           placeholder="Search models..."
+          value={search}
           onChange={(e) => setSearch(e.target.value)}
           style={{
-            marginBottom: "20px",
-            padding: "10px",
             width: "100%",
+            padding: "10px",
+            marginBottom: "20px",
           }}
         />
 
         {/* PRODUCTS */}
         <h2>Products</h2>
+
         <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
           {filteredProducts.map((p) => (
             <div
               key={p.id}
               onClick={() => setSelectedProduct(p)}
               style={{
-                cursor: "pointer",
+                width: "250px",
                 border: "1px solid #ddd",
                 borderRadius: "10px",
-                padding: "15px",
-                width: "250px",
+                padding: "10px",
+                cursor: "pointer",
                 background: "#fff",
-                transition: "0.2s",
               }}
-              onMouseEnter={(e) =>
-                (e.currentTarget.style.transform = "scale(1.03)")
-              }
-              onMouseLeave={(e) =>
-                (e.currentTarget.style.transform = "scale(1)")
-              }
             >
               {p.image && (
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  style={{ width: "100%", borderRadius: "5px" }}
-                />
+                {p.image}
               )}
 
               <h3>{p.name}</h3>
@@ -125,78 +109,40 @@ export default function App() {
           ))}
         </div>
 
-        {/* SELECTED PRODUCT */}
+        {/* SELECTED */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
 
             {selectedProduct.link && (
-              <p>
-                <a
-                  href={selectedProduct.link}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  View Model
-                </a>
-              </p>
+              {selectedProduct.link}
+                View Model
+              </a>
             )}
           </div>
         )}
 
-        {/* ORDER FORM */}
+        {/* FORM */}
         {selectedProduct && (
           <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
-            <h2>Order: {selectedProduct.name}</h2>
+            <h2>Order</h2>
 
-            <div
-              style={{
-                display: "flex",
-                flexDirection: "column",
-                maxWidth: "400px",
-                gap: "10px",
-              }}
-            >
-              <input name="name" placeholder="Your Name" required />
-              <input name="email" type="email" placeholder="Your Email" required />
-              <input name="material" placeholder="Material (PLA, ABS...)" />
-              <input name="color" placeholder="Color" />
-              <input name="quantity" type="number" defaultValue="1" />
+            <input name="name" placeholder="Name" required />
+            <input name="email" placeholder="Email" required />
 
-              {/* ✅ FILE UPLOAD */}
-              <label>Upload your 3D file (STL/OBJ):</label>
-              <input type="file" name="file" accept=".stl,.obj" />
+            <input type="file" name="file" />
 
-              <textarea
-                name="details"
-                placeholder="Describe your request"
-              ></textarea>
+            <input
+              type="hidden"
+              name="product"
+              value={selectedProduct.name}
+            />
 
-              <input
-                type="hidden"
-                name="product"
-                value={selectedProduct.name}
-              />
-
-              <button
-                type="submit"
-                disabled={state.submitting}
-                style={{
-                  padding: "10px",
-                  background: "#0070f3",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "5px",
-                }}
-              >
-                {state.submitting ? "Submitting..." : "Submit Order"}
-              </button>
-            </div>
+            <button type="submit">Submit</button>
           </form>
         )}
 
-        {/* CONTACT */}
-        <p style={{ marginTop: "40px", fontSize: "14px", color: "#555" }}>
+        <p style={{ marginTop: "40px" }}>
           Contact: orders@envision3d.co.za
         </p>
       </div>
