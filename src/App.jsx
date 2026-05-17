@@ -13,6 +13,7 @@ export default function App() {
   const [orderRef, setOrderRef] = useState("");
   const [state, handleSubmit] = useForm("xgodnrrl");
 
+  // ✅ PRODUCTS
   const products = [
     {
       id: 1,
@@ -41,6 +42,7 @@ export default function App() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // ✅ GENERATE ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
@@ -84,7 +86,7 @@ export default function App() {
           style={{
             color: "#0070f3",
             fontSize: "28px",
-            letterSpacing: "2px"
+            letterSpacing: "2px",
           }}
         >
           {orderRef}
@@ -101,7 +103,7 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
-
+      
       {/* ✅ HEADER */}
       <div
         style={{
@@ -133,8 +135,8 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        {/* ✅ FIXED LOGO */}
-        <img src={logo} alt="Logo" style={{ height: "40px" }} />
+        {/* ✅ LOGO FIXED */}
+        <img src={logo} alt="logo" style={{ height: "40px" }} />
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -153,7 +155,7 @@ export default function App() {
                   padding: "15px",
                 }}
               >
-                {/* ✅ FIXED IMAGE */}
+                {/* ✅ IMAGE FIXED */}
                 {p.image ? (
                   <img
                     src={p.image}
@@ -163,6 +165,7 @@ export default function App() {
                       height: "140px",
                       objectFit: "cover",
                       marginBottom: "10px",
+                      borderRadius: "5px",
                     }}
                   />
                 ) : (
@@ -246,7 +249,6 @@ export default function App() {
             Reference: {orderRef}
           </h3>
 
-          {/* ✅ PAYMENT DETAILS */}
           <h4>Banking Details</h4>
           <p><strong>Bank:</strong> ABSA</p>
           <p><strong>Account Name:</strong> AJ Rautenbach</p>
@@ -258,7 +260,6 @@ export default function App() {
             ⚠️ Use this reference exactly when making payment
           </p>
 
-          {/* ✅ FORM */}
           <form onSubmit={handleSubmit}>
             <input name="name" placeholder="Name" required /><br /><br />
             <input name="email" placeholder="Email" required /><br /><br />
