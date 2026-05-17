@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ Images
+// ✅ IMPORT IMAGES
 import banner from "./assets/banner.jpeg";
 import logo from "./assets/logo.jpeg";
 
@@ -36,7 +36,7 @@ export default function App() {
     },
   ];
 
-  // ✅ Safe filtering (no disappearing products)
+  // ✅ FIX: prevents products disappearing when search is empty
   const filteredProducts =
     search.trim() === ""
       ? products
@@ -46,11 +46,11 @@ export default function App() {
 
   if (!state) return <p>Loading...</p>;
 
-  // ✅ Success message
+  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", textAlign: "center", fontFamily: "Arial" }}>
-        <img src={logo} alt="Logo" style={{ width: "200px" }} />
+        <img src={logo} alt="logo" style={{ width: "180px" }} />
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -59,29 +59,28 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "Arial" }}>
-
+      
       {/* ✅ HEADER */}
-      <div style={{ textAlign: "center", padding: "20px" }}>
-        <img src={logo} alt="Logo" style={{ width: "200px" }} />
-        <p style={{ marginTop: "10px" }}>3D Printing Services</p>
+      <div style={{ textAlign: "center", padding: "15px" }}>
+        <img src={logo} alt="logo" style={{ width: "180px" }} />
+        <p style={{ marginTop: "5px" }}>3D Printing Services</p>
       </div>
 
-      {/* ✅ BANNER */}
-      <div style={{ width: "100%" }}>
-        <img
-          src={banner}
-          alt="Banner"
-          style={{
-            width: "100%",
-            height: "auto",
-            display: "block",
-          }}
-        />
-      </div>
+      {/* ✅ BANNER (FIXED CLEAN DISPLAY) */}
+      <img
+        src={banner}
+        alt="banner"
+        style={{
+          width: "100%",
+          height: "300px",
+          objectFit: "cover",
+          display: "block",
+        }}
+      />
 
       {/* ✅ MAIN CONTENT */}
       <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
-
+        
         {/* SEARCH */}
         <input
           placeholder="Search models..."
@@ -109,6 +108,7 @@ export default function App() {
                 padding: "10px",
                 cursor: "pointer",
                 background: "#fff",
+                transition: "0.2s",
               }}
             >
               {p.image && (
@@ -125,7 +125,7 @@ export default function App() {
           ))}
         </div>
 
-        {/* SELECTED PRODUCT */}
+        {/* PRODUCT DETAILS */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
@@ -147,10 +147,10 @@ export default function App() {
           <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
             <h2>Order</h2>
 
-            <input name="name" placeholder="Name" required />
+            <input name="name" placeholder="Your Name" required />
             <br /><br />
 
-            <input name="email" placeholder="Email" required />
+            <input name="email" placeholder="Your Email" required />
             <br /><br />
 
             <input type="file" name="file" />
@@ -162,7 +162,7 @@ export default function App() {
               value={selectedProduct.name}
             />
 
-            <button type="submit">Submit</button>
+            <button type="submit">Submit Order</button>
           </form>
         )}
 
@@ -174,3 +174,4 @@ export default function App() {
     </div>
   );
 }
+``
