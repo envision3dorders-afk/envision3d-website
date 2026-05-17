@@ -21,21 +21,18 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image:
-        "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
       link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image:
-        "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
 
-  // ✅ FIX: Only filter if search has text
   const filteredProducts =
     search.trim() === ""
       ? products
@@ -48,7 +45,7 @@ export default function App() {
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
-        {logo}
+        <img src={logo} alt="logo" style={{ width: "200px" }} />
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -57,15 +54,21 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "Arial" }}>
-      
+
       {/* ✅ HEADER */}
       <div style={{ textAlign: "center", padding: "20px" }}>
-        {logo}
-        <p>3D Printing Services</p>
+        <img src={logo} alt="logo" style={{ width: "200px" }} />
+        <p style={{ marginTop: "10px" }}>3D Printing Services</p>
       </div>
 
       {/* ✅ BANNER */}
-      {banner}
+      <div>
+        <img
+          src={banner}
+          alt="banner"
+          style={{ width: "100%", display: "block" }}
+        />
+      </div>
 
       {/* ✅ MAIN */}
       <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
@@ -74,78 +77,3 @@ export default function App() {
         <input
           placeholder="Search models..."
           value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          style={{
-            width: "100%",
-            padding: "10px",
-            marginBottom: "20px",
-          }}
-        />
-
-        {/* PRODUCTS */}
-        <h2>Products</h2>
-
-        <div style={{ display: "flex", gap: "15px", flexWrap: "wrap" }}>
-          {filteredProducts.map((p) => (
-            <div
-              key={p.id}
-              onClick={() => setSelectedProduct(p)}
-              style={{
-                width: "250px",
-                border: "1px solid #ddd",
-                borderRadius: "10px",
-                padding: "10px",
-                cursor: "pointer",
-                background: "#fff",
-              }}
-            >
-              {p.image && (
-                {p.image}
-              )}
-
-              <h3>{p.name}</h3>
-              <p>{p.price}</p>
-            </div>
-          ))}
-        </div>
-
-        {/* SELECTED */}
-        {selectedProduct && (
-          <div style={{ marginTop: "30px" }}>
-            <h2>{selectedProduct.name}</h2>
-
-            {selectedProduct.link && (
-              {selectedProduct.link}
-                View Model
-              </a>
-            )}
-          </div>
-        )}
-
-        {/* FORM */}
-        {selectedProduct && (
-          <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
-            <h2>Order</h2>
-
-            <input name="name" placeholder="Name" required />
-            <input name="email" placeholder="Email" required />
-
-            <input type="file" name="file" />
-
-            <input
-              type="hidden"
-              name="product"
-              value={selectedProduct.name}
-            />
-
-            <button type="submit">Submit</button>
-          </form>
-        )}
-
-        <p style={{ marginTop: "40px" }}>
-          Contact: orders@envision3d.co.za
-        </p>
-      </div>
-    </div>
-  );
-}
