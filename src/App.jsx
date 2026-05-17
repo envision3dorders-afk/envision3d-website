@@ -4,9 +4,9 @@ import { useForm } from "@formspree/react";
 import logo from "./assets/logo-circle.jpeg";
 
 export default function App() {
-  const [selectedProduct, setSelectedProduct] = useState(null);
   const [search, setSearch] = useState("");
-  const [cart, setCart] = useState([]); // ✅ NEW CART STATE
+  const [cart, setCart] = useState([]);
+  const [view, setView] = useState("products"); // ✅ NEW
   const [state, handleSubmit] = useForm("xgodnrrl");
 
   const products = [
@@ -22,39 +22,29 @@ export default function App() {
       name: "Phone Stand",
       price: 120,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
-      description: "Compact and durable stand for smartphones",
+      description: "Compact stand for smartphones",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
-      description: "Detailed miniature perfect for collectors",
+      description: "Detailed miniature for collectors",
     },
   ];
 
-  const filteredProducts =
-    search.trim() === ""
-      ? products
-      : products.filter((p) =>
-          p.name.toLowerCase().includes(search.toLowerCase())
-        );
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
 
-  if (!state) return <p>Loading...</p>;
+  const addToCart = (product) => setCart([...cart, product]);
 
-  // ✅ ADD TO CART FUNCTION
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
-
-  // ✅ REMOVE FROM CART
   const removeFromCart = (index) => {
     const updated = [...cart];
     updated.splice(index, 1);
     setCart(updated);
   };
 
-  // ✅ CALCULATE TOTAL
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
@@ -81,7 +71,9 @@ export default function App() {
           borderBottom: "1px solid #ddd",
         }}
       >
-        <h2>Envision3D</h2>
+        <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
+          Envision3D
+        </h2>
 
         <input
           placeholder="Search models..."
@@ -95,18 +87,16 @@ export default function App() {
           }}
         />
 
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <p style={{ margin: 0 }}>orders@envision3d.co.za</p>
+        <button onClick={() => setView("cart")}>
+          Cart ({cart.length})
+        </button>
 
-          {logo}
-        </div>
+        {logo}
       </div>
 
-      {/* ✅ MAIN CONTENT */}
-      <div style={{ display: "flex", gap: "20px", padding: "20px" }}>
-
-        {/* ✅ PRODUCTS */}
-        <div style={{ flex: 3 }}>
+      {/* ✅ PRODUCTS VIEW */}
+      {view === "products" && (
+        <div style={{ padding: "20px" }}>
           <h2>Products</h2>
 
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
@@ -118,21 +108,10 @@ export default function App() {
                   background: "#fff",
                   borderRadius: "10px",
                   padding: "15px",
-                  boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
                 }}
               >
                 {p.image ? (
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    style={{
-                      width: "100%",
-                      height: "140px",
-                      objectFit: "cover",
-                      borderRadius: "5px",
-                      marginBottom: "10px",
-                    }}
-                  />
+                  {p.image}
                 ) : (
                   <div style={{ height: "140px", background: "#eee" }}>
                     Custom Upload
@@ -140,76 +119,34 @@ export default function App() {
                 )}
 
                 <h3>{p.name}</h3>
+                <p>{p.description}</p>
 
-                <p style={{ fontSize: "14px" }}>{p.description}</p>
-
-                <p style={{ fontWeight: "bold", color: "#0070f3" }}>
+                <p style={{ fontWeight: "bold" }}>
                   {typeof p.price === "number" ? `R${p.price}` : p.price}
                 </p>
 
-                <button
-                  onClick={() => addToCart(p)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    background: "#0070f3",
-                    color: "#fff",
-                    border: "none",
-                    borderRadius: "5px",
-                    marginBottom: "5px",
-                  }}
-                >
-                  Add to Cart
-                </button>
-
-                <button
-                  onClick={() => setSelectedProduct(p)}
-                  style={{
-                    width: "100%",
-                    padding: "8px",
-                    background: "#eee",
-                    border: "none",
-                    borderRadius: "5px",
-                  }}
-                >
-                  Order Now
-                </button>
+                <button onClick={() => addToCart(p)}>Add to Cart</button>
               </div>
             ))}
           </div>
         </div>
+      )}
 
-        {/* ✅ CART PANEL */}
-        <div
-          style={{
-            flex: 1,
-            background: "#fff",
-            padding: "15px",
-            borderRadius: "10px",
-            height: "fit-content",
-          }}
-        >
-          <h3>🛒 Cart</h3>
+      {/* ✅ CART VIEW */}
+      {view === "cart" && (
+        <div style={{ padding: "20px" }}>
+          <h2>🛒 Your Cart</h2>
 
           {cart.length === 0 ? (
-            <p>No items yet</p>
+            <p>No items in cart</p>
           ) : (
             <>
               {cart.map((item, index) => (
-                <div
-                  key={index}
-                  style={{
-                    borderBottom: "1px solid #ddd",
-                    marginBottom: "10px",
-                    paddingBottom: "5px",
-                  }}
-                >
-                  <p>{item.name}</p>
-                  <p>
-                    {typeof item.price === "number"
-                      ? `R${item.price}`
-                      : item.price}
-                  </p>
+                <div key={index}>
+                  {item.name} -{" "}
+                  {typeof item.price === "number"
+                    ? `R${item.price}`
+                    : item.price}
 
                   <button onClick={() => removeFromCart(index)}>
                     Remove
@@ -217,23 +154,40 @@ export default function App() {
                 </div>
               ))}
 
-              <h4>Total: R{total}</h4>
+              <h3>Total: R{total}</h3>
+
+              <button onClick={() => setView("checkout")}>
+                Proceed to Checkout
+              </button>
             </>
           )}
         </div>
-      </div>
+      )}
 
-      {/* ✅ ORDER FORM */}
-      {selectedProduct && (
-        <form onSubmit={handleSubmit} style={{ padding: "20px" }}>
-          <h2>Order: {selectedProduct.name}</h2>
+      {/* ✅ CHECKOUT VIEW */}
+      {view === "checkout" && (
+        <div style={{ padding: "20px" }}>
+          <h2>Checkout</h2>
 
-          <input name="name" placeholder="Name" required /><br /><br />
-          <input name="email" placeholder="Email" required /><br /><br />
-          <input type="file" name="file" /><br /><br />
+          <h3>Order Summary</h3>
+          {cart.map((item, i) => (
+            <p key={i}>
+              {item.name} -{" "}
+              {typeof item.price === "number"
+                ? `R${item.price}`
+                : item.price}
+            </p>
+          ))}
 
-          <button type="submit">Submit Order</button>
-        </form>
+          <h3>Total: R{total}</h3>
+
+          <form onSubmit={handleSubmit}>
+            <input name="name" placeholder="Your Name" required /><br /><br />
+            <input name="email" placeholder="Your Email" required /><br /><br />
+
+            <button type="submit">Submit Order</button>
+          </form>
+        </div>
       )}
     </div>
   );
