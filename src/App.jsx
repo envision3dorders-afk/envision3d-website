@@ -21,14 +21,16 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
       link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
@@ -42,10 +44,11 @@ export default function App() {
 
   if (!state) return <p>Loading...</p>;
 
+  // ✅ Success screen
   if (state.succeeded) {
     return (
       <div style={{ textAlign: "center", padding: "20px" }}>
-        <img src={logo} alt="logo" style={{ width: "200px" }} />
+        <img src={logo} alt="logo" style={{ width: "180px" }} />
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -56,7 +59,7 @@ export default function App() {
     <div style={{ fontFamily: "Arial" }}>
 
       {/* ✅ HERO SECTION */}
-      <div style={{ position: "relative", width: "100%", height: "350px" }}>
+      <div style={{ position: "relative", width: "100%" }}>
 
         {/* ✅ Banner */}
         <img
@@ -64,12 +67,13 @@ export default function App() {
           alt="banner"
           style={{
             width: "100%",
-            height: "100%",
+            height: "320px",
             objectFit: "cover",
+            display: "block",
           }}
         />
 
-        {/* ✅ Dark overlay */}
+        {/* ✅ Overlay */}
         <div
           style={{
             position: "absolute",
@@ -77,7 +81,7 @@ export default function App() {
             left: 0,
             width: "100%",
             height: "100%",
-            background: "rgba(0,0,0,0.3)",
+            background: "rgba(0, 0, 0, 0.35)",
           }}
         />
 
@@ -92,8 +96,23 @@ export default function App() {
             color: "#fff",
           }}
         >
-          <img src={logo} alt="logo" style={{ width: "200px" }} />
-          <p style={{ marginTop: "10px", fontWeight: "bold" }}>
+          <img
+            src={logo}
+            alt="logo"
+            style={{
+              width: "180px",
+              filter: "drop-shadow(0 0 10px rgba(255,255,255,0.6))",
+            }}
+          />
+
+          <p
+            style={{
+              marginTop: "10px",
+              fontWeight: "bold",
+              fontSize: "18px",
+              textShadow: "0 2px 6px rgba(0,0,0,0.8)",
+            }}
+          >
             3D Printing Services
           </p>
         </div>
@@ -101,7 +120,7 @@ export default function App() {
 
       {/* ✅ MAIN CONTENT */}
       <div style={{ maxWidth: "900px", margin: "auto", padding: "20px" }}>
-        
+
         {/* SEARCH */}
         <input
           placeholder="Search models..."
@@ -129,13 +148,23 @@ export default function App() {
                 padding: "10px",
                 cursor: "pointer",
                 background: "#fff",
+                transition: "0.2s",
               }}
+              onMouseEnter={(e) =>
+                (e.currentTarget.style.transform = "scale(1.03)")
+              }
+              onMouseLeave={(e) =>
+                (e.currentTarget.style.transform = "scale(1)")
+              }
             >
               {p.image && (
                 <img
                   src={p.image}
                   alt={p.name}
-                  style={{ width: "100%", borderRadius: "8px" }}
+                  style={{
+                    width: "100%",
+                    borderRadius: "6px",
+                  }}
                 />
               )}
 
@@ -145,34 +174,48 @@ export default function App() {
           ))}
         </div>
 
-        {/* PRODUCT DETAILS */}
+        {/* ✅ PRODUCT DETAIL */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
 
             {selectedProduct.link && (
-              <a href={selectedProduct.link} target="_blank" rel="noopener noreferrer">
+              <a
+                href={selectedProduct.link}
+                target="_blank"
+                rel="noopener noreferrer"
+              >
                 View Model
               </a>
             )}
           </div>
         )}
 
-        {/* ORDER FORM */}
+        {/* ✅ ORDER FORM */}
         {selectedProduct && (
           <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
             <h2>Order</h2>
 
-            <input name="name" placeholder="Your Name" required /><br /><br />
-            <input name="email" placeholder="Your Email" required /><br /><br />
-            <input type="file" name="file" /><br /><br />
+            <input name="name" placeholder="Your Name" required />
+            <br /><br />
 
-            <input type="hidden" name="product" value={selectedProduct.name} />
+            <input name="email" placeholder="Your Email" required />
+            <br /><br />
+
+            <input type="file" name="file" />
+            <br /><br />
+
+            <input
+              type="hidden"
+              name="product"
+              value={selectedProduct.name}
+            />
 
             <button type="submit">Submit Order</button>
           </form>
         )}
 
+        {/* ✅ CONTACT */}
         <p style={{ marginTop: "40px" }}>
           Contact: orders@envision3d.co.za
         </p>
