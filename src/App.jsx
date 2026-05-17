@@ -22,16 +22,14 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image:
-        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand for smartphones",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image:
-        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
       description: "Detailed miniature for collectors",
     },
   ];
@@ -75,8 +73,7 @@ export default function App() {
         <p>Please use the above reference when making payment.</p>
 
         <p>
-          Once payment is received, we will confirm your order and begin
-          printing.
+          Once payment is received, we will confirm your order and begin printing.
         </p>
       </div>
     );
@@ -116,8 +113,8 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        {/* ✅ LOGO */}
-        {logo}
+        {/* ✅ FIXED LOGO */}
+        <img src={logo} alt="Logo" style={{ width: "40px" }} />
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -136,8 +133,19 @@ export default function App() {
                   padding: "15px",
                 }}
               >
+                {/* ✅ FIXED IMAGE */}
                 {p.image ? (
-                  {p.image}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{
+                      width: "100%",
+                      height: "140px",
+                      objectFit: "cover",
+                      marginBottom: "10px",
+                      borderRadius: "5px"
+                    }}
+                  />
                 ) : (
                   <div
                     style={{
@@ -146,6 +154,7 @@ export default function App() {
                       display: "flex",
                       alignItems: "center",
                       justifyContent: "center",
+                      marginBottom: "10px"
                     }}
                   >
                     Custom Upload
