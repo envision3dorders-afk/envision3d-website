@@ -67,7 +67,6 @@ export default function App() {
         status: "Pending Payment",
         date: new Date().toISOString(),
       });
-      console.log("Order saved");
     } catch (error) {
       console.error(error);
     }
