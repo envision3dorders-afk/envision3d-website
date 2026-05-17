@@ -34,7 +34,7 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
-      {/* ✅ HEADER */}
+      {/* ✅ HEADER (NEW LAYOUT) */}
       <div
         style={{
           display: "flex",
@@ -45,17 +45,10 @@ export default function App() {
           borderBottom: "1px solid #ddd",
         }}
       >
-        {/* ✅ LOGO FIXED */}
-        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          <img
-            src={logo}
-            alt="Envision3D Logo"
-            style={{ width: "40px", height: "40px" }}
-          />
-          <h2 style={{ margin: 0 }}>Envision3D</h2>
-        </div>
+        {/* ✅ LEFT: COMPANY NAME */}
+        <h2 style={{ margin: 0 }}>Envision3D</h2>
 
-        {/* SEARCH */}
+        {/* ✅ CENTER: SEARCH */}
         <input
           placeholder="Search models..."
           value={search}
@@ -70,10 +63,23 @@ export default function App() {
           }}
         />
 
-        {/* CONTACT */}
-        <p style={{ fontSize: "14px" }}>
-          orders@envision3d.co.za
-        </p>
+        {/* ✅ RIGHT: EMAIL + BIG LOGO */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          <p style={{ fontSize: "14px", margin: 0 }}>
+            orders@envision3d.co.za
+          </p>
+
+          <img
+            src={logo}
+            alt="logo"
+            style={{
+              width: "60px",
+              height: "60px",
+              borderRadius: "50%",
+              objectFit: "cover",
+            }}
+          />
+        </div>
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -92,7 +98,7 @@ export default function App() {
                 boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
               }}
             >
-              {/* IMAGE PLACEHOLDER */}
+              {/* IMAGE */}
               <div
                 style={{
                   height: "120px",
@@ -160,4 +166,3 @@ export default function App() {
     </div>
   );
 }
-``
