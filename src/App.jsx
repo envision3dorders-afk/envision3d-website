@@ -13,7 +13,6 @@ export default function App() {
   const [orderRef, setOrderRef] = useState("");
   const [state, handleSubmit] = useForm("xgodnrrl");
 
-  // ✅ PRODUCTS
   const products = [
     {
       id: 1,
@@ -26,14 +25,16 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand for smartphones",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
       description: "Detailed miniature for collectors",
     },
   ];
@@ -42,11 +43,12 @@ export default function App() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ GENERATE ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  const addToCart = (product) => setCart([...cart, product]);
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
 
   const removeFromCart = (index) => {
     const updated = [...cart];
@@ -58,7 +60,7 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER TO FIREBASE
+  // ✅ Save to Firebase
   const saveOrder = async () => {
     try {
       await addDoc(collection(db, "orders"), {
@@ -70,11 +72,11 @@ export default function App() {
       });
       console.log("✅ Order saved to Firebase");
     } catch (error) {
-      console.error("❌ Error saving order:", error);
+      console.error("❌ Firebase error:", error);
     }
   };
 
-  // ✅ SUCCESS SCREEN
+  // ✅ Success page
   if (state.succeeded) {
     saveOrder();
 
@@ -82,29 +84,19 @@ export default function App() {
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
 
-        <h2
-          style={{
-            color: "#0070f3",
-            fontSize: "28px",
-            letterSpacing: "2px",
-          }}
-        >
+        <h2 style={{ color: "#0070f3", fontSize: "28px" }}>
           {orderRef}
         </h2>
 
-        <p>Please use the above reference when making payment.</p>
-
-        <p>
-          Once payment is received, we will confirm your order and begin printing.
-        </p>
+        <p>Please use this reference when making payment.</p>
       </div>
     );
   }
 
   return (
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
-      
-      {/* ✅ HEADER */}
+
+      {/* HEADER */}
       <div
         style={{
           display: "flex",
@@ -135,11 +127,11 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        {/* ✅ LOGO FIXED */}
-        <img src={logo} alt="logo" style={{ height: "40px" }} />
+        {/* ✅ FIXED LOGO */}
+        <img src={logo} alt="logo" style={{ width: "50px" }} />
       </div>
 
-      {/* ✅ PRODUCTS */}
+      {/* PRODUCTS */}
       {view === "products" && (
         <div style={{ padding: "20px" }}>
           <h2>Products</h2>
@@ -155,17 +147,15 @@ export default function App() {
                   padding: "15px",
                 }}
               >
-                {/* ✅ IMAGE FIXED */}
+                {/* ✅ FIXED IMAGE */}
                 {p.image ? (
                   <img
                     src={p.image}
                     alt={p.name}
                     style={{
                       width: "100%",
-                      height: "140px",
-                      objectFit: "cover",
-                      marginBottom: "10px",
                       borderRadius: "5px",
+                      marginBottom: "10px",
                     }}
                   />
                 ) : (
@@ -201,7 +191,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ CART */}
+      {/* CART */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
           <h2>🛒 Cart</h2>
@@ -238,7 +228,7 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ CHECKOUT */}
+      {/* CHECKOUT */}
       {view === "checkout" && (
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
@@ -250,11 +240,11 @@ export default function App() {
           </h3>
 
           <h4>Banking Details</h4>
-          <p><strong>Bank:</strong> ABSA</p>
-          <p><strong>Account Name:</strong> AJ Rautenbach</p>
-          <p><strong>Account Type:</strong> Savings</p>
-          <p><strong>Account Number:</strong> 9377967059</p>
-          <p><strong>Branch Code:</strong> 632005</p>
+          <p>Bank: ABSA</p>
+          <p>Account Name: AJ Rautenbach</p>
+          <p>Account Type: Savings</p>
+          <p>Account Number: 9377967059</p>
+          <p>Branch Code: 632005</p>
 
           <p style={{ color: "red", fontWeight: "bold" }}>
             ⚠️ Use this reference exactly when making payment
@@ -273,4 +263,3 @@ export default function App() {
     </div>
   );
 }
-``
