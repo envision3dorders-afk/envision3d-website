@@ -21,16 +21,14 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: "R120",
-      image:
-        "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Phone+Stand",
       link: "https://makerworld.com/en",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: "R85",
-      image:
-        "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
+      image: "https://dummyimage.com/250x150/cccccc/000000&text=Miniature",
       link: "https://www.crealitycloud.com/",
     },
   ];
@@ -47,7 +45,7 @@ export default function App() {
   if (state.succeeded) {
     return (
       <div style={{ textAlign: "center", padding: "20px" }}>
-        {logo}
+        <img src={logo} alt="logo" style={{ width: "200px" }} />
         <h1>✅ Order Received</h1>
         <p>We will contact you from orders@envision3d.co.za</p>
       </div>
@@ -56,14 +54,22 @@ export default function App() {
 
   return (
     <div style={{ fontFamily: "Arial" }}>
-      
-      {/* ✅ HERO SECTION (COMBINED LOGO + BANNER) */}
-      <div style={{ position: "relative", width: "100%", height: "320px" }}>
 
-        {/* 🎨 Banner */}
-        {banner}
+      {/* ✅ HERO SECTION */}
+      <div style={{ position: "relative", width: "100%", height: "350px" }}>
 
-        {/* 🎨 Dark overlay for readability */}
+        {/* ✅ Banner */}
+        <img
+          src={banner}
+          alt="banner"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+          }}
+        />
+
+        {/* ✅ Dark overlay */}
         <div
           style={{
             position: "absolute",
@@ -71,7 +77,7 @@ export default function App() {
             left: 0,
             width: "100%",
             height: "100%",
-            backgroundColor: "rgba(0,0,0,0.3)",
+            background: "rgba(0,0,0,0.3)",
           }}
         />
 
@@ -86,8 +92,7 @@ export default function App() {
             color: "#fff",
           }}
         >
-          {logo}
-
+          <img src={logo} alt="logo" style={{ width: "200px" }} />
           <p style={{ marginTop: "10px", fontWeight: "bold" }}>
             3D Printing Services
           </p>
@@ -127,7 +132,11 @@ export default function App() {
               }}
             >
               {p.image && (
-                {p.image}
+                <img
+                  src={p.image}
+                  alt={p.name}
+                  style={{ width: "100%", borderRadius: "8px" }}
+                />
               )}
 
               <h3>{p.name}</h3>
@@ -136,13 +145,13 @@ export default function App() {
           ))}
         </div>
 
-        {/* SELECTED PRODUCT */}
+        {/* PRODUCT DETAILS */}
         {selectedProduct && (
           <div style={{ marginTop: "30px" }}>
             <h2>{selectedProduct.name}</h2>
 
             {selectedProduct.link && (
-              {selectedProduct.link}
+              <a href={selectedProduct.link} target="_blank" rel="noopener noreferrer">
                 View Model
               </a>
             )}
@@ -154,26 +163,16 @@ export default function App() {
           <form onSubmit={handleSubmit} style={{ marginTop: "30px" }}>
             <h2>Order</h2>
 
-            <input name="name" placeholder="Your Name" required />
-            <br /><br />
+            <input name="name" placeholder="Your Name" required /><br /><br />
+            <input name="email" placeholder="Your Email" required /><br /><br />
+            <input type="file" name="file" /><br /><br />
 
-            <input name="email" placeholder="Your Email" required />
-            <br /><br />
-
-            <input type="file" name="file" />
-            <br /><br />
-
-            <input
-              type="hidden"
-              name="product"
-              value={selectedProduct.name}
-            />
+            <input type="hidden" name="product" value={selectedProduct.name} />
 
             <button type="submit">Submit Order</button>
           </form>
         )}
 
-        {/* CONTACT */}
         <p style={{ marginTop: "40px" }}>
           Contact: orders@envision3d.co.za
         </p>
