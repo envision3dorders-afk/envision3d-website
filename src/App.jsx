@@ -1,6 +1,9 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
+import { db } from "./firebase";
+import { collection, addDoc } from "firebase/firestore";
+
 import logo from "./assets/logo-circle.jpeg";
 
 export default function App() {
@@ -38,9 +41,8 @@ export default function App() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const generateOrderRef = () => {
-    return "ENV-" + Math.floor(10000 + Math.random() * 90000);
-  };
+  const generateOrderRef = () =>
+    "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
   const addToCart = (product) => setCart([...cart, product]);
 
@@ -54,27 +56,35 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SUCCESS SCREEN
+  // ✅ SAVE ORDER TO FIREBASE
+  const saveOrder = async () => {
+    try {
+      await addDoc(collection(db, "orders"), {
+        ref: orderRef,
+        items: cart,
+        total: total,
+        status: "Pending Payment",
+        date: new Date().toISOString(),
+      });
+      console.log("✅ Order saved to Firebase");
+    } catch (error) {
+      console.error("❌ Error saving order:", error);
+    }
+  };
+
+  // ✅ SUCCESS PAGE
   if (state.succeeded) {
+    saveOrder();
+
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
 
-        <h2
-          style={{
-            color: "#0070f3",
-            fontSize: "28px",
-            letterSpacing: "2px",
-          }}
-        >
+        <h2 style={{ color: "#0070f3", fontSize: "28px" }}>
           {orderRef}
         </h2>
 
         <p>Please use the above reference when making payment.</p>
-
-        <p>
-          Once payment is received, we will confirm your order and begin printing.
-        </p>
       </div>
     );
   }
@@ -83,16 +93,13 @@ export default function App() {
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
       {/* ✅ HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "10px 20px",
-          background: "#fff",
-          borderBottom: "1px solid #ddd",
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px 20px",
+        background: "#fff",
+        borderBottom: "1px solid #ddd"
+      }}>
         <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
           Envision3D
         </h2>
@@ -101,20 +108,14 @@ export default function App() {
           placeholder="Search models..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            flex: 1,
-            margin: "0 20px",
-            padding: "10px",
-            maxWidth: "500px",
-          }}
+          style={{ flex: 1, margin: "0 20px", padding: "10px" }}
         />
 
         <button onClick={() => setView("cart")}>
           Cart ({cart.length})
         </button>
 
-        {/* ✅ FIXED LOGO */}
-        <img src={logo} alt="Logo" style={{ width: "40px" }} />
+        <img src={logo} alt="logo" style={{ width: "40px" }} />
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -124,39 +125,25 @@ export default function App() {
 
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
             {filteredProducts.map((p) => (
-              <div
-                key={p.id}
-                style={{
-                  width: "250px",
-                  background: "#fff",
-                  borderRadius: "10px",
-                  padding: "15px",
-                }}
-              >
-                {/* ✅ FIXED IMAGE */}
+              <div key={p.id} style={{
+                width: "250px",
+                background: "#fff",
+                padding: "15px",
+                borderRadius: "10px"
+              }}>
                 {p.image ? (
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    style={{
-                      width: "100%",
-                      height: "140px",
-                      objectFit: "cover",
-                      marginBottom: "10px",
-                      borderRadius: "5px"
-                    }}
-                  />
+                  <img src={p.image} alt={p.name} style={{
+                    width: "100%",
+                    borderRadius: "5px"
+                  }} />
                 ) : (
-                  <div
-                    style={{
-                      height: "140px",
-                      background: "#eee",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                      marginBottom: "10px"
-                    }}
-                  >
+                  <div style={{
+                    height: "140px",
+                    background: "#eee",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                     Custom Upload
                   </div>
                 )}
@@ -164,9 +151,9 @@ export default function App() {
                 <h3>{p.name}</h3>
                 <p>{p.description}</p>
 
-                <p style={{ fontWeight: "bold" }}>
+                <p><strong>
                   {typeof p.price === "number" ? `R${p.price}` : p.price}
-                </p>
+                </strong></p>
 
                 <button onClick={() => addToCart(p)}>
                   Add to Cart
@@ -180,37 +167,29 @@ export default function App() {
       {/* ✅ CART */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
-          <h2>🛒 Your Cart</h2>
+          <h2>🛒 Cart</h2>
 
-          {cart.length === 0 ? (
-            <p>No items in cart</p>
-          ) : (
-            <>
-              {cart.map((item, index) => (
-                <div key={index}>
-                  {item.name} -{" "}
-                  {typeof item.price === "number"
-                    ? `R${item.price}`
-                    : item.price}
+          {cart.map((item, i) => (
+            <div key={i}>
+              {item.name} - {typeof item.price === "number"
+                ? `R${item.price}` : item.price}
 
-                  <button onClick={() => removeFromCart(index)}>
-                    Remove
-                  </button>
-                </div>
-              ))}
-
-              <h3>Total: R{total}</h3>
-
-              <button
-                onClick={() => {
-                  setOrderRef(generateOrderRef());
-                  setView("checkout");
-                }}
-              >
-                Proceed to Checkout
+              <button onClick={() => removeFromCart(i)}>
+                Remove
               </button>
-            </>
-          )}
+            </div>
+          ))}
+
+          <h3>Total: R{total}</h3>
+
+          <button
+            onClick={() => {
+              setOrderRef(generateOrderRef());
+              setView("checkout");
+            }}
+          >
+            Checkout
+          </button>
         </div>
       )}
 
@@ -219,50 +198,23 @@ export default function App() {
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
-          <h3>Order Summary</h3>
-          {cart.map((item, i) => (
-            <p key={i}>
-              {item.name} -{" "}
-              {typeof item.price === "number"
-                ? `R${item.price}`
-                : item.price}
-            </p>
-          ))}
-
           <h3>Total: R{total}</h3>
 
+          <h3 style={{ color: "#0070f3" }}>
+            Reference: {orderRef}
+          </h3>
+
           {/* ✅ PAYMENT DETAILS */}
-          <h3>Payment Instructions</h3>
-
           <h4>Banking Details</h4>
-          <p><strong>Bank:</strong> ABSA</p>
-          <p><strong>Account Name:</strong> AJ Rautenbach</p>
-          <p><strong>Account Type:</strong> Savings</p>
-          <p><strong>Account Number:</strong> 9377967059</p>
-          <p><strong>Branch Code:</strong> 632005</p>
+          <p>Bank: ABSA</p>
+          <p>Account Name: AJ Rautenbach</p>
+          <p>Account Type: Savings</p>
+          <p>Account Number: 9377967059</p>
+          <p>Branch Code: 632005</p>
 
-          <h2
-            style={{
-              color: "#0070f3",
-              fontSize: "28px",
-              letterSpacing: "2px",
-            }}
-          >
-            {orderRef}
-          </h2>
-
-          <p style={{ color: "red", fontWeight: "bold" }}>
-            ⚠️ Use the exact reference above when making payment.
-          </p>
-
-          <p>
-            Once payment is received, we will process and print your order.
-          </p>
-
-          {/* ✅ FORM */}
           <form onSubmit={handleSubmit}>
-            <input name="name" placeholder="Your Name" required /><br /><br />
-            <input name="email" placeholder="Your Email" required /><br /><br />
+            <input name="name" placeholder="Name" required /><br /><br />
+            <input name="email" placeholder="Email" required /><br /><br />
 
             <input type="hidden" name="orderRef" value={orderRef} />
 
