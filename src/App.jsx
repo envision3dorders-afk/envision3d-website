@@ -35,7 +35,6 @@ export default function App() {
     },
   ];
 
-  // ✅ Prevent disappearing products
   const filteredProducts =
     search.trim() === ""
       ? products
@@ -58,14 +57,15 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial" }}>
 
-      {/* ✅ HERO IMAGE (FIXED HEIGHT BANNER) */}
+      {/* ✅ HERO IMAGE — FIXED CROPPING */}
       <img
         src={hero}
-        alt="Envision3D Hero"
+        alt="Envision3D Banner"
         style={{
           width: "100%",
-          height: "300px",       // ✅ Controls banner height
-          objectFit: "cover",    // ✅ Crops nicely instead of stretching
+          height: "300px",
+          objectFit: "cover",
+          objectPosition: "top", // ✅ THIS FIXES YOUR LOGO ISSUE
         }}
       />
 
@@ -112,7 +112,13 @@ export default function App() {
                 <img
                   src={p.image}
                   alt={p.name}
-                  style={{ width: "100%", borderRadius: "5px" }}
+                  style={{
+                    width: "100%",
+                    height: "150px",
+                    objectFit: "cover",
+                    borderRadius: "8px",
+                    marginBottom: "10px",
+                  }}
                 />
               )}
 
