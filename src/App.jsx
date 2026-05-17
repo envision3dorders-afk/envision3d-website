@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ Use circle logo
+// ✅ Import circle logo correctly
 import logo from "./assets/logo-circle.jpeg";
 
 export default function App() {
@@ -15,9 +15,12 @@ export default function App() {
     { id: 3, name: "Miniature Figurine", price: "R85" },
   ];
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts =
+    search.trim() === ""
+      ? products
+      : products.filter((p) =>
+          p.name.toLowerCase().includes(search.toLowerCase())
+        );
 
   if (!state) return <p>Loading...</p>;
 
@@ -32,7 +35,7 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial" }}>
 
-      {/* ✅ HEADER (TAKEALOT STYLE) */}
+      {/* ✅ HEADER (FIXED LOGO) */}
       <div
         style={{
           display: "flex",
@@ -43,8 +46,12 @@ export default function App() {
           background: "#fff",
         }}
       >
-        {/* LOGO */}
-        {logo}        />
+        {/* ✅ FIXED IMAGE TAG */}
+        <img
+          src={logo}
+          alt="Envision3D Logo"
+          style={{ width: "60px", height: "60px", borderRadius: "50%" }}
+        />
 
         {/* SEARCH */}
         <input
@@ -65,7 +72,7 @@ export default function App() {
         </p>
       </div>
 
-      {/* ✅ PRODUCTS SECTION */}
+      {/* ✅ PRODUCTS */}
       <div style={{ padding: "20px" }}>
         <h2>Products</h2>
 
@@ -118,4 +125,3 @@ export default function App() {
     </div>
   );
 }
-``
