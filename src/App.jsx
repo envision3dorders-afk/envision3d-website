@@ -14,9 +14,12 @@ export default function App() {
     { id: 3, name: "Miniature Figurine", price: "R85" },
   ];
 
-  const filteredProducts = products.filter((p) =>
-    p.name.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredProducts =
+    search.trim() === ""
+      ? products
+      : products.filter((p) =>
+          p.name.toLowerCase().includes(search.toLowerCase())
+        );
 
   if (!state) return <p>Loading...</p>;
 
@@ -31,7 +34,7 @@ export default function App() {
   return (
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
-      {/* ✅ HEADER (UPGRADED) */}
+      {/* ✅ HEADER */}
       <div
         style={{
           display: "flex",
@@ -42,9 +45,13 @@ export default function App() {
           borderBottom: "1px solid #ddd",
         }}
       >
-        {/* BRAND */}
+        {/* ✅ LOGO FIXED */}
         <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
-          {logo}
+          <img
+            src={logo}
+            alt="Envision3D Logo"
+            style={{ width: "40px", height: "40px" }}
+          />
           <h2 style={{ margin: 0 }}>Envision3D</h2>
         </div>
 
@@ -69,7 +76,7 @@ export default function App() {
         </p>
       </div>
 
-      {/* ✅ CONTENT */}
+      {/* ✅ PRODUCTS */}
       <div style={{ padding: "20px" }}>
         <h2>Products</h2>
 
@@ -95,29 +102,27 @@ export default function App() {
                 }}
               />
 
-              <h3 style={{ marginBottom: "5px" }}>{p.name}</h3>
+              <h3>{p.name}</h3>
 
               <p
                 style={{
                   fontWeight: "bold",
                   color: "#0070f3",
-                  marginBottom: "10px",
                 }}
               >
                 {p.price}
               </p>
 
-              {/* ACTIONS */}
               <button
                 onClick={() => setSelectedProduct(p)}
                 style={{
+                  marginTop: "10px",
                   width: "100%",
                   padding: "8px",
                   background: "#0070f3",
                   color: "#fff",
                   border: "none",
                   borderRadius: "5px",
-                  marginBottom: "5px",
                 }}
               >
                 Order
@@ -125,6 +130,7 @@ export default function App() {
 
               <button
                 style={{
+                  marginTop: "5px",
                   width: "100%",
                   padding: "8px",
                   background: "#eee",
@@ -139,7 +145,7 @@ export default function App() {
         </div>
       </div>
 
-      {/* ✅ FORM */}
+      {/* ✅ ORDER FORM */}
       {selectedProduct && (
         <form onSubmit={handleSubmit} style={{ padding: "20px" }}>
           <h2>Order: {selectedProduct.name}</h2>
@@ -154,3 +160,4 @@ export default function App() {
     </div>
   );
 }
+``
