@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useForm } from "@formspree/react";
 
-// ✅ Import circle logo correctly
 import logo from "./assets/logo-circle.jpeg";
 
 export default function App() {
@@ -15,12 +14,9 @@ export default function App() {
     { id: 3, name: "Miniature Figurine", price: "R85" },
   ];
 
-  const filteredProducts =
-    search.trim() === ""
-      ? products
-      : products.filter((p) =>
-          p.name.toLowerCase().includes(search.toLowerCase())
-        );
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   if (!state) return <p>Loading...</p>;
 
@@ -33,25 +29,24 @@ export default function App() {
   }
 
   return (
-    <div style={{ fontFamily: "Arial" }}>
+    <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
-      {/* ✅ HEADER (FIXED LOGO) */}
+      {/* ✅ HEADER (UPGRADED) */}
       <div
         style={{
           display: "flex",
           alignItems: "center",
           justifyContent: "space-between",
           padding: "10px 20px",
-          borderBottom: "1px solid #ddd",
           background: "#fff",
+          borderBottom: "1px solid #ddd",
         }}
       >
-        {/* ✅ FIXED IMAGE TAG */}
-        <img
-          src={logo}
-          alt="Envision3D Logo"
-          style={{ width: "60px", height: "60px", borderRadius: "50%" }}
-        />
+        {/* BRAND */}
+        <div style={{ display: "flex", alignItems: "center", gap: "10px" }}>
+          {logo}
+          <h2 style={{ margin: 0 }}>Envision3D</h2>
+        </div>
 
         {/* SEARCH */}
         <input
@@ -63,6 +58,8 @@ export default function App() {
             margin: "0 20px",
             padding: "10px",
             maxWidth: "500px",
+            borderRadius: "5px",
+            border: "1px solid #ccc",
           }}
         />
 
@@ -72,7 +69,7 @@ export default function App() {
         </p>
       </div>
 
-      {/* ✅ PRODUCTS */}
+      {/* ✅ CONTENT */}
       <div style={{ padding: "20px" }}>
         <h2>Products</h2>
 
@@ -82,35 +79,67 @@ export default function App() {
               key={p.id}
               style={{
                 width: "250px",
-                border: "1px solid #ddd",
+                background: "#fff",
                 borderRadius: "10px",
                 padding: "15px",
-                background: "#fff",
+                boxShadow: "0 2px 6px rgba(0,0,0,0.1)",
               }}
             >
-              <h3>{p.name}</h3>
-              <p>{p.price}</p>
+              {/* IMAGE PLACEHOLDER */}
+              <div
+                style={{
+                  height: "120px",
+                  background: "#eee",
+                  borderRadius: "5px",
+                  marginBottom: "10px",
+                }}
+              />
 
+              <h3 style={{ marginBottom: "5px" }}>{p.name}</h3>
+
+              <p
+                style={{
+                  fontWeight: "bold",
+                  color: "#0070f3",
+                  marginBottom: "10px",
+                }}
+              >
+                {p.price}
+              </p>
+
+              {/* ACTIONS */}
               <button
                 onClick={() => setSelectedProduct(p)}
                 style={{
-                  marginTop: "10px",
-                  padding: "8px",
                   width: "100%",
+                  padding: "8px",
                   background: "#0070f3",
                   color: "#fff",
                   border: "none",
                   borderRadius: "5px",
+                  marginBottom: "5px",
                 }}
               >
                 Order
+              </button>
+
+              <button
+                style={{
+                  width: "100%",
+                  padding: "8px",
+                  background: "#eee",
+                  border: "none",
+                  borderRadius: "5px",
+                }}
+              >
+                View Model
               </button>
             </div>
           ))}
         </div>
       </div>
 
-      {/* ✅ ORDER FORM */}
+      {/* ✅ FORM */}
       {selectedProduct && (
         <form onSubmit={handleSubmit} style={{ padding: "20px" }}>
           <h2>Order: {selectedProduct.name}</h2>
