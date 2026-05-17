@@ -56,17 +56,27 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
+  // ✅ SUCCESS SCREEN
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
 
-        <h2 style={{ color: "#0070f3" }}>{orderRef}</h2>
+        <h2
+          style={{
+            color: "#0070f3",
+            fontSize: "28px",
+            letterSpacing: "2px",
+          }}
+        >
+          {orderRef}
+        </h2>
 
         <p>Please use the above reference when making payment.</p>
 
         <p>
-          Once payment is received, we will confirm your order and begin printing.
+          Once payment is received, we will confirm your order and begin
+          printing.
         </p>
       </div>
     );
@@ -106,7 +116,8 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        <img src={logo} alt="Logo" style={{ height: "40px" }} />
+        {/* ✅ LOGO */}
+        {logo}
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -126,11 +137,7 @@ export default function App() {
                 }}
               >
                 {p.image ? (
-                  <img
-                    src={p.image}
-                    alt={p.name}
-                    style={{ width: "100%", marginBottom: "10px" }}
-                  />
+                  {p.image}
                 ) : (
                   <div
                     style={{
@@ -218,12 +225,22 @@ export default function App() {
           {/* ✅ PAYMENT DETAILS */}
           <h3>Payment Instructions</h3>
 
+          <h4>Banking Details</h4>
           <p><strong>Bank:</strong> ABSA</p>
           <p><strong>Account Name:</strong> AJ Rautenbach</p>
+          <p><strong>Account Type:</strong> Savings</p>
           <p><strong>Account Number:</strong> 9377967059</p>
           <p><strong>Branch Code:</strong> 632005</p>
 
-          <h2 style={{ color: "#0070f3" }}>{orderRef}</h2>
+          <h2
+            style={{
+              color: "#0070f3",
+              fontSize: "28px",
+              letterSpacing: "2px",
+            }}
+          >
+            {orderRef}
+          </h2>
 
           <p style={{ color: "red", fontWeight: "bold" }}>
             ⚠️ Use the exact reference above when making payment.
@@ -233,6 +250,7 @@ export default function App() {
             Once payment is received, we will process and print your order.
           </p>
 
+          {/* ✅ FORM */}
           <form onSubmit={handleSubmit}>
             <input name="name" placeholder="Your Name" required /><br /><br />
             <input name="email" placeholder="Your Email" required /><br /><br />
@@ -246,4 +264,3 @@ export default function App() {
     </div>
   );
 }
-``
