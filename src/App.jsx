@@ -39,7 +39,9 @@ export default function App() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  const addToCart = (product) => setCart([...cart, product]);
+  const addToCart = (product) => {
+    setCart([...cart, product]);
+  };
 
   const removeFromCart = (index) => {
     const updated = [...cart];
@@ -93,10 +95,11 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        {logo}
+        {/* ✅ FIXED LOGO */}
+        <img src={logo} alt="logo" style={{ width: "50px", borderRadius: "50%" }} />
       </div>
 
-      {/* ✅ PRODUCTS */}
+      {/* ✅ PRODUCTS VIEW */}
       {view === "products" && (
         <div style={{ padding: "20px" }}>
           <h2>Products</h2>
@@ -112,10 +115,31 @@ export default function App() {
                   padding: "15px",
                 }}
               >
+                {/* ✅ FIXED IMAGE */}
                 {p.image ? (
-                  {p.image}
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{
+                      width: "100%",
+                      height: "140px",
+                      objectFit: "cover",
+                      borderRadius: "5px",
+                      marginBottom: "10px",
+                    }}
+                  />
                 ) : (
-                  <div style={{ height: "140px", background: "#eee" }}>
+                  <div
+                    style={{
+                      height: "140px",
+                      background: "#eee",
+                      borderRadius: "5px",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "center",
+                      marginBottom: "10px",
+                    }}
+                  >
                     Custom Upload
                   </div>
                 )}
@@ -127,14 +151,16 @@ export default function App() {
                   {typeof p.price === "number" ? `R${p.price}` : p.price}
                 </p>
 
-                <button onClick={() => addToCart(p)}>Add to Cart</button>
+                <button onClick={() => addToCart(p)}>
+                  Add to Cart
+                </button>
               </div>
             ))}
           </div>
         </div>
       )}
 
-      {/* ✅ CART */}
+      {/* ✅ CART VIEW */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
           <h2>🛒 Your Cart</h2>
@@ -144,13 +170,16 @@ export default function App() {
           ) : (
             <>
               {cart.map((item, index) => (
-                <div key={index}>
+                <div key={index} style={{ marginBottom: "10px" }}>
                   {item.name} -{" "}
                   {typeof item.price === "number"
                     ? `R${item.price}`
                     : item.price}
 
-                  <button onClick={() => removeFromCart(index)}>
+                  <button
+                    onClick={() => removeFromCart(index)}
+                    style={{ marginLeft: "10px" }}
+                  >
                     Remove
                   </button>
                 </div>
@@ -166,10 +195,12 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ CHECKOUT */}
+      {/* ✅ CHECKOUT VIEW */}
       {view === "checkout" && (
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
+
+          <h3>Order Summary</h3>
 
           {cart.map((item, i) => (
             <p key={i}>
@@ -183,8 +214,11 @@ export default function App() {
           <h3>Total: R{total}</h3>
 
           <form onSubmit={handleSubmit}>
-            <input name="name" placeholder="Your Name" required /><br /><br />
-            <input name="email" placeholder="Your Email" required /><br /><br />
+            <input name="name" placeholder="Your Name" required />
+            <br /><br />
+
+            <input name="email" placeholder="Your Email" required />
+            <br /><br />
 
             <button type="submit">Submit Order</button>
           </form>
@@ -193,3 +227,4 @@ export default function App() {
     </div>
   );
 }
+``
