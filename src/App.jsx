@@ -7,7 +7,7 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
-  const [orderRef, setOrderRef] = useState(""); // ✅ NEW
+  const [orderRef, setOrderRef] = useState("");
   const [state, handleSubmit] = useForm("xgodnrrl");
 
   const products = [
@@ -22,14 +22,16 @@ export default function App() {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand for smartphones",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
       description: "Detailed miniature for collectors",
     },
   ];
@@ -38,7 +40,6 @@ export default function App() {
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ GENERATE ORDER REFERENCE
   const generateOrderRef = () => {
     return "ENV-" + Math.floor(10000 + Math.random() * 90000);
   };
@@ -60,7 +61,7 @@ export default function App() {
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
         <p>
-          Please complete payment using your reference code:
+          Please complete payment using your reference:
           <strong> {orderRef}</strong>
         </p>
       </div>
@@ -71,16 +72,14 @@ export default function App() {
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
       {/* ✅ HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          alignItems: "center",
-          padding: "10px 20px",
-          background: "#fff",
-          borderBottom: "1px solid #ddd",
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        padding: "10px 20px",
+        background: "#fff",
+        borderBottom: "1px solid #ddd"
+      }}>
         <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
           Envision3D
         </h2>
@@ -89,19 +88,15 @@ export default function App() {
           placeholder="Search models..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          style={{
-            flex: 1,
-            margin: "0 20px",
-            padding: "10px",
-            maxWidth: "500px",
-          }}
+          style={{ flex: 1, margin: "0 20px", padding: "10px", maxWidth: "500px" }}
         />
 
         <button onClick={() => setView("cart")}>
           Cart ({cart.length})
         </button>
 
-        {logo}
+        {/* ✅ FIXED LOGO */}
+        <img src={logo} alt="Logo" style={{ width: "50px" }} />
       </div>
 
       {/* ✅ PRODUCTS */}
@@ -111,18 +106,28 @@ export default function App() {
 
           <div style={{ display: "flex", gap: "20px", flexWrap: "wrap" }}>
             {filteredProducts.map((p) => (
-              <div
-                key={p.id}
-                style={{
-                  width: "250px",
-                  background: "#fff",
-                  borderRadius: "10px",
-                  padding: "15px",
-                }}
-              >
+              <div key={p.id} style={{
+                width: "250px",
+                background: "#fff",
+                borderRadius: "10px",
+                padding: "15px"
+              }}>
+
+                {/* ✅ FIXED IMAGE */}
                 {p.image ? (
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{ width: "100%", borderRadius: "5px", marginBottom: "10px" }}
+                  />
                 ) : (
-                  <div style={{ height: "140px", background: "#eee" }}>
+                  <div style={{
+                    height: "140px",
+                    background: "#eee",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center"
+                  }}>
                     Custom Upload
                   </div>
                 )}
@@ -154,10 +159,7 @@ export default function App() {
             <>
               {cart.map((item, index) => (
                 <div key={index}>
-                  {item.name} -{" "}
-                  {typeof item.price === "number"
-                    ? `R${item.price}`
-                    : item.price}
+                  {item.name} - {typeof item.price === "number" ? `R${item.price}` : item.price}
 
                   <button onClick={() => removeFromCart(index)}>
                     Remove
@@ -167,11 +169,9 @@ export default function App() {
 
               <h3>Total: R{total}</h3>
 
-              {/* ✅ GENERATE ORDER REF HERE */}
               <button
                 onClick={() => {
-                  const ref = generateOrderRef();
-                  setOrderRef(ref);
+                  setOrderRef(generateOrderRef());
                   setView("checkout");
                 }}
               >
@@ -187,35 +187,23 @@ export default function App() {
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
-          <h3>Order Summary</h3>
           {cart.map((item, i) => (
             <p key={i}>
-              {item.name} -{" "}
-              {typeof item.price === "number"
-                ? `R${item.price}`
-                : item.price}
+              {item.name} - {typeof item.price === "number" ? `R${item.price}` : item.price}
             </p>
           ))}
 
           <h3>Total: R{total}</h3>
 
-          {/* ✅ PAYMENT INSTRUCTIONS */}
           <h3>Payment Instructions</h3>
           <p><strong>Bank:</strong> ABSA</p>
           <p><strong>Account:</strong> YOUR ACCOUNT NUMBER</p>
           <p><strong>Reference:</strong> {orderRef}</p>
-          <p><strong>Amount:</strong> R{total}</p>
 
-          <p style={{ color: "red" }}>
-            ⚠️ Use your reference exactly or your order may be delayed
-          </p>
-
-          {/* ✅ FORM */}
           <form onSubmit={handleSubmit}>
             <input name="name" placeholder="Your Name" required /><br /><br />
             <input name="email" placeholder="Your Email" required /><br /><br />
 
-            {/* ✅ INCLUDE ORDER REF */}
             <input type="hidden" name="orderRef" value={orderRef} />
 
             <button type="submit">Submit Order</button>
