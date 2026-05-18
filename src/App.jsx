@@ -7,7 +7,8 @@ import {
   addDoc,
   getDocs,
   doc,
-  updateDoc
+  updateDoc,
+  deleteDoc,
 } from "firebase/firestore";
 
 import logo from "./assets/logo-circle.jpeg";
@@ -67,7 +68,7 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER (ONCE)
+  // ✅ SAVE ORDER (ONLY ONCE)
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
@@ -81,6 +82,7 @@ export default function App() {
   useEffect(() => {
     if (state.succeeded) {
       saveOrder();
+      setCart([]); // clear cart after order
     }
   }, [state.succeeded]);
 
@@ -88,11 +90,9 @@ export default function App() {
   const loadOrders = async () => {
     const snapshot = await getDocs(collection(db, "orders"));
     const data = [];
-
     snapshot.forEach((docSnap) => {
       data.push({ id: docSnap.id, ...docSnap.data() });
     });
-
     setOrders(data);
   };
 
@@ -103,6 +103,12 @@ export default function App() {
   // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
     await updateDoc(doc(db, "orders", id), { status });
+    loadOrders();
+  };
+
+  // ✅ DELETE ORDER
+  const deleteOrder = async (id) => {
+    await deleteDoc(doc(db, "orders", id));
     loadOrders();
   };
 
@@ -121,12 +127,15 @@ export default function App() {
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
       {/* HEADER */}
-      <div style={{
-        display: "flex",
-        justifyContent: "space-between",
-        padding: "10px 20px",
-        background: "#fff"
-      }}>
+      <div
+        style={{
+          display: "flex",
+          justifyContent: "space-between",
+          padding: "10px 20px",
+          background: "#fff",
+          alignItems: "center",
+        }}
+      >
         <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
           Envision3D
         </h2>
@@ -141,10 +150,12 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        <button onClick={() => {
-          loadOrders();
-          setView("orders");
-        }}>
+        <button
+          onClick={() => {
+            loadOrders();
+            setView("orders");
+          }}
+        >
           Orders ({orders.length})
         </button>
 
@@ -157,11 +168,14 @@ export default function App() {
           <h2>Products</h2>
 
           {filteredProducts.map((p) => (
-            <div key={p.id} style={{
-              background: "#fff",
-              padding: "15px",
-              marginBottom: "10px"
-            }}>
+            <div
+              key={p.id}
+              style={{
+                background: "#fff",
+                padding: "15px",
+                marginBottom: "10px",
+              }}
+            >
               {p.image ? (
                 <img src={p.image} alt={p.name} width="200" />
               ) : (
@@ -172,10 +186,11 @@ export default function App() {
 
               <h3>{p.name}</h3>
               <p>{p.description}</p>
-
               <p>
                 <strong>
-                  {typeof p.price === "number" ? `R${p.price}` : p.price}
+                  {typeof p.price === "number"
+                    ? `R${p.price}`
+                    : p.price}
                 </strong>
               </p>
 
@@ -196,17 +211,18 @@ export default function App() {
               {typeof item.price === "number"
                 ? `R${item.price}`
                 : item.price}
-
               <button onClick={() => removeFromCart(i)}>Remove</button>
             </div>
           ))}
 
           <h3>Total: R{total}</h3>
 
-          <button onClick={() => {
-            setOrderRef(generateOrderRef());
-            setView("checkout");
-          }}>
+          <button
+            onClick={() => {
+              setOrderRef(generateOrderRef());
+              setView("checkout");
+            }}
+          >
             Checkout
           </button>
         </div>
@@ -217,53 +233,3 @@ export default function App() {
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
-          <p>Total: R{total}</p>
-          <p>Reference: {orderRef}</p>
-
-          <form onSubmit={handleSubmit}>
-            <input name="name" placeholder="Name" required /><br /><br />
-            <input name="email" placeholder="Email" required /><br /><br />
-
-            <input type="hidden" name="orderRef" value={orderRef} />
-
-            <button type="submit">Submit Order</button>
-          </form>
-        </div>
-      )}
-
-      {/* ✅ ORDERS DASHBOARD */}
-      {view === "orders" && (
-        <div style={{ padding: "20px" }}>
-          <h2>📦 Orders</h2>
-
-          {orders.map((o) => (
-            <div key={o.id} style={{
-              background: "#fff",
-              padding: "15px",
-              marginBottom: "10px"
-            }}>
-              <p><strong>{o.ref}</strong></p>
-              <p>Total: R{o.total}</p>
-              <p>Status: {o.status}</p>
-              <p>Date: {new Date(o.date).toLocaleString()}</p>
-
-              {/* ✅ STATUS BUTTONS */}
-              <div>
-                <button onClick={() => updateStatus(o.id, "Paid")}>
-                  Paid
-                </button>
-                <button onClick={() => updateStatus(o.id, "Printing")}>
-                  Printing
-                </button>
-                <button onClick={() => updateStatus(o.id, "Completed")}>
-                  Completed
-                </button>
-              </div>
-            </div>
-          ))}
-        </div>
-      )}
-
-    </div>
-  );
-}
