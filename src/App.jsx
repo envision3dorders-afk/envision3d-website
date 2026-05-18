@@ -11,9 +11,10 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
   const [orderRef, setOrderRef] = useState("");
-  const [orders, setOrders] = useState([]); // ✅ NEW
+  const [orders, setOrders] = useState([]);
   const [state, handleSubmit] = useForm("xgodnrrl");
 
+  // ✅ PRODUCTS
   const products = [
     {
       id: 1,
@@ -38,13 +39,16 @@ export default function App() {
     },
   ];
 
+  // ✅ SEARCH
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // ✅ ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
+  // ✅ CART
   const addToCart = (product) => setCart([...cart, product]);
 
   const removeFromCart = (index) => {
@@ -53,11 +57,12 @@ export default function App() {
     setCart(updated);
   };
 
+  // ✅ TOTAL
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER
+  // ✅ SAVE ORDER (ONLY ONCE)
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
@@ -68,13 +73,18 @@ export default function App() {
     });
   };
 
+  // ✅ PREVENT DUPLICATES
+  useEffect(() => {
+    if (state.succeeded) {
+      saveOrder();
+    }
+  }, [state.succeeded]);
+
   // ✅ LOAD ORDERS
   const loadOrders = async () => {
-    const querySnapshot = await getDocs(collection(db, "orders"));
+    const snapshot = await getDocs(collection(db, "orders"));
     const list = [];
-    querySnapshot.forEach((doc) => {
-      list.push(doc.data());
-    });
+    snapshot.forEach((doc) => list.push(doc.data()));
     setOrders(list);
   };
 
@@ -82,10 +92,8 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ SUCCESS PAGE
+  // ✅ SUCCESS SCREEN
   if (state.succeeded) {
-    saveOrder();
-
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
@@ -119,11 +127,14 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        <button onClick={() => setView("orders")}>
+        <button onClick={() => {
+          loadOrders(); // refresh before viewing
+          setView("orders");
+        }}>
           Orders ({orders.length})
         </button>
 
-        {logo}
+        <img src={logo} alt="logo" style={{ width: "40px" }} />
       </div>
 
       {/* PRODUCTS */}
@@ -158,11 +169,15 @@ export default function App() {
       {/* CART */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
-          <h2>Cart</h2>
+          <h2>🛒 Cart</h2>
 
           {cart.map((item, i) => (
             <div key={i}>
-              {item.name} - {item.price}
+              {item.name} -{" "}
+              {typeof item.price === "number"
+                ? `R${item.price}`
+                : item.price}
+
               <button onClick={() => removeFromCart(i)}>Remove</button>
             </div>
           ))}
@@ -197,16 +212,16 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ NEW: ORDERS VIEW */}
+      {/* ✅ ORDERS DASHBOARD */}
       {view === "orders" && (
         <div style={{ padding: "20px" }}>
           <h2>📦 Orders</h2>
 
           {orders.length === 0 ? (
-            <p>No orders yet</p>
+            <p>No orders</p>
           ) : (
-            orders.map((o, index) => (
-              <div key={index} style={{
+            orders.map((o, i) => (
+              <div key={i} style={{
                 background: "#fff",
                 padding: "15px",
                 marginBottom: "10px"
@@ -224,4 +239,3 @@ export default function App() {
     </div>
   );
 }
-``
