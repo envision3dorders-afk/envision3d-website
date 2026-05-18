@@ -22,7 +22,7 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [state, handleSubmit] = useForm("xgodnrrl");
 
-  // ✅ MAKERWORLD STYLE
+  // ✅ STYLES (MakerWorld inspired)
   const containerStyle = {
     fontFamily: "Arial",
     background: "#0f1115",
@@ -143,13 +143,13 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ STATUS UPDATE
+  // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
     await updateDoc(doc(db, "orders", id), { status });
     loadOrders();
   };
 
-  // ✅ DELETE
+  // ✅ DELETE ORDER
   const deleteOrder = async (id) => {
     await deleteDoc(doc(db, "orders", id));
     loadOrders();
@@ -159,13 +159,14 @@ export default function App() {
   const getStatusColor = (status) => {
     if (status === "Completed") return "#22c55e";
     if (status === "Printing") return "#3b82f6";
+    if (status === "Paid") return "#a855f7";
     return "#f59e0b";
   };
 
-  // ✅ SUCCESS
+  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     return (
-      <div style={{ padding: "40px", textAlign: "center", color: "#fff" }}>
+      <div style={{ padding: "40px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
         <h2 style={{ color: "#3b82f6" }}>{orderRef}</h2>
       </div>
@@ -192,14 +193,22 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        <button style={buttonStyle} onClick={() => {
-          loadOrders();
-          setView("orders");
-        }}>
+        <button
+          style={buttonStyle}
+          onClick={() => {
+            loadOrders();
+            setView("orders");
+          }}
+        >
           Orders ({orders.length})
         </button>
 
-        {logo}
+        {/* ✅ FIXED LOGO */}
+        <img
+          src={logo}
+          alt="logo"
+          style={{ width: "40px", borderRadius: "50%" }}
+        />
       </div>
 
       <div style={{ padding: "30px" }}>
@@ -212,7 +221,15 @@ export default function App() {
             {filteredProducts.map((p) => (
               <div key={p.id} style={cardStyle}>
                 {p.image ? (
-                  <img src={p.image} alt={p.name} style={{ width: "200px" }} />
+                  <img
+                    src={p.image}
+                    alt={p.name}
+                    style={{
+                      width: "200px",
+                      borderRadius: "8px",
+                      marginBottom: "10px"
+                    }}
+                  />
                 ) : (
                   <div style={{ height: "140px", background: "#333" }} />
                 )}
@@ -306,7 +323,6 @@ export default function App() {
         )}
 
       </div>
-
     </div>
   );
 }
