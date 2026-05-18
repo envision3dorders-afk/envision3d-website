@@ -35,14 +35,14 @@ export default function App() {
       name: "Phone Stand",
       price: 120,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
-      description: "Compact stand for smartphones",
+      description: "Compact stand",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
-      description: "Collector miniature",
+      description: "Mini collectible",
     },
   ];
 
@@ -64,11 +64,14 @@ export default function App() {
     setCart(updated);
   };
 
-  const total = cart.reduce((sum, item) => {
-    return typeof item.price === "number" ? sum + item.price : sum;
-  }, 0);
+  // ✅ TOTAL
+  const total = cart.reduce(
+    (sum, item) =>
+      typeof item.price === "number" ? sum + item.price : sum,
+    0
+  );
 
-  // ✅ SAVE ORDER (ONLY ONCE)
+  // ✅ SAVE ORDER
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
@@ -79,21 +82,22 @@ export default function App() {
     });
   };
 
+  // ✅ PREVENT DUPLICATES
   useEffect(() => {
     if (state.succeeded) {
       saveOrder();
-      setCart([]); // clear cart after order
+      setCart([]);
     }
   }, [state.succeeded]);
 
   // ✅ LOAD ORDERS
   const loadOrders = async () => {
     const snapshot = await getDocs(collection(db, "orders"));
-    const data = [];
-    snapshot.forEach((docSnap) => {
-      data.push({ id: docSnap.id, ...docSnap.data() });
-    });
-    setOrders(data);
+    const list = [];
+    snapshot.forEach((docSnap) =>
+      list.push({ id: docSnap.id, ...docSnap.data() })
+    );
+    setOrders(list);
   };
 
   useEffect(() => {
@@ -186,6 +190,7 @@ export default function App() {
 
               <h3>{p.name}</h3>
               <p>{p.description}</p>
+
               <p>
                 <strong>
                   {typeof p.price === "number"
@@ -211,6 +216,7 @@ export default function App() {
               {typeof item.price === "number"
                 ? `R${item.price}`
                 : item.price}
+
               <button onClick={() => removeFromCart(i)}>Remove</button>
             </div>
           ))}
@@ -233,3 +239,58 @@ export default function App() {
         <div style={{ padding: "20px" }}>
           <h2>Checkout</h2>
 
+          <p>Total: R{total}</p>
+          <p>Reference: {orderRef}</p>
+
+          <form onSubmit={handleSubmit}>
+            <input name="name" placeholder="Name" required />
+            <br /><br />
+
+            <input name="email" placeholder="Email" required />
+            <br /><br />
+
+            <input type="hidden" name="orderRef" value={orderRef} />
+
+            <button type="submit">Submit Order</button>
+          </form>
+        </div>
+      )}
+
+      {/* ORDERS DASHBOARD */}
+      {view === "orders" && (
+        <div style={{ padding: "20px" }}>
+          <h2>📦 Orders</h2>
+
+          {orders.map((o) => (
+            <div
+              key={o.id}
+              style={{
+                background: "#fff",
+                padding: "15px",
+                marginBottom: "10px",
+              }}
+            >
+              <p><strong>{o.ref}</strong></p>
+              <p>Total: R{o.total}</p>
+              <p>Status: {o.status}</p>
+              <p>Date: {new Date(o.date).toLocaleString()}</p>
+
+              <div>
+                <button onClick={() => updateStatus(o.id, "Paid")}>Paid</button>
+                <button onClick={() => updateStatus(o.id, "Printing")}>Printing</button>
+                <button onClick={() => updateStatus(o.id, "Completed")}>Completed</button>
+
+                <button
+                  onClick={() => deleteOrder(o.id)}
+                  style={{ marginLeft: "10px", background: "red", color: "white" }}
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
