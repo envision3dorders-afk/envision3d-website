@@ -1,8 +1,8 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useForm } from "@formspree/react";
 
 import { db } from "./firebase";
-import { collection, addDoc } from "firebase/firestore";
+import { collection, addDoc, getDocs } from "firebase/firestore";
 
 import logo from "./assets/logo-circle.jpeg";
 
@@ -11,6 +11,7 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
   const [orderRef, setOrderRef] = useState("");
+  const [orders, setOrders] = useState([]); // ✅ NEW
   const [state, handleSubmit] = useForm("xgodnrrl");
 
   const products = [
@@ -44,9 +45,7 @@ export default function App() {
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  const addToCart = (product) => {
-    setCart([...cart, product]);
-  };
+  const addToCart = (product) => setCart([...cart, product]);
 
   const removeFromCart = (index) => {
     const updated = [...cart];
@@ -58,21 +57,32 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
+  // ✅ SAVE ORDER
   const saveOrder = async () => {
-    try {
-      await addDoc(collection(db, "orders"), {
-        ref: orderRef,
-        items: cart,
-        total: total,
-        status: "Pending Payment",
-        date: new Date().toISOString(),
-      });
-      console.log("Order saved");
-    } catch (error) {
-      console.error(error);
-    }
+    await addDoc(collection(db, "orders"), {
+      ref: orderRef,
+      items: cart,
+      total: total,
+      status: "Pending Payment",
+      date: new Date().toISOString(),
+    });
   };
 
+  // ✅ LOAD ORDERS
+  const loadOrders = async () => {
+    const querySnapshot = await getDocs(collection(db, "orders"));
+    const list = [];
+    querySnapshot.forEach((doc) => {
+      list.push(doc.data());
+    });
+    setOrders(list);
+  };
+
+  useEffect(() => {
+    loadOrders();
+  }, []);
+
+  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     saveOrder();
 
@@ -89,14 +99,12 @@ export default function App() {
     <div style={{ fontFamily: "Arial", background: "#f5f5f5" }}>
 
       {/* HEADER */}
-      <div
-        style={{
-          display: "flex",
-          justifyContent: "space-between",
-          padding: "10px 20px",
-          background: "#fff",
-        }}
-      >
+      <div style={{
+        display: "flex",
+        justifyContent: "space-between",
+        padding: "10px 20px",
+        background: "#fff"
+      }}>
         <h2 onClick={() => setView("products")} style={{ cursor: "pointer" }}>
           Envision3D
         </h2>
@@ -111,7 +119,11 @@ export default function App() {
           Cart ({cart.length})
         </button>
 
-        <img src={logo} alt="logo" style={{ width: "40px" }} />
+        <button onClick={() => setView("orders")}>
+          Orders ({orders.length})
+        </button>
+
+        {logo}
       </div>
 
       {/* PRODUCTS */}
@@ -120,21 +132,13 @@ export default function App() {
           <h2>Products</h2>
 
           {filteredProducts.map((p) => (
-            <div
-              key={p.id}
-              style={{
-                background: "#fff",
-                padding: "15px",
-                marginBottom: "15px",
-                borderRadius: "10px",
-              }}
-            >
+            <div key={p.id} style={{
+              background: "#fff",
+              padding: "15px",
+              marginBottom: "10px"
+            }}>
               {p.image ? (
-                <img
-                  src={p.image}
-                  alt={p.name}
-                  style={{ width: "100%", maxWidth: "200px" }}
-                />
+                <img src={p.image} alt={p.name} width="200" />
               ) : (
                 <div style={{ height: "140px", background: "#eee" }}>
                   Custom Upload
@@ -143,18 +147,9 @@ export default function App() {
 
               <h3>{p.name}</h3>
               <p>{p.description}</p>
+              <p>{typeof p.price === "number" ? `R${p.price}` : p.price}</p>
 
-              <p>
-                <strong>
-                  {typeof p.price === "number"
-                    ? `R${p.price}`
-                    : p.price}
-                </strong>
-              </p>
-
-              <button onClick={() => addToCart(p)}>
-                Add to Cart
-              </button>
+              <button onClick={() => addToCart(p)}>Add to Cart</button>
             </div>
           ))}
         </div>
@@ -163,35 +158,23 @@ export default function App() {
       {/* CART */}
       {view === "cart" && (
         <div style={{ padding: "20px" }}>
-          <h2>🛒 Cart</h2>
+          <h2>Cart</h2>
 
-          {cart.length === 0 ? (
-            <p>No items in cart</p>
-          ) : (
-            <>
-              {cart.map((item, i) => (
-                <div key={i}>
-                  {item.name} -{" "}
-                  {typeof item.price === "number"
-                    ? `R${item.price}`
-                    : item.price}
+          {cart.map((item, i) => (
+            <div key={i}>
+              {item.name} - {item.price}
+              <button onClick={() => removeFromCart(i)}>Remove</button>
+            </div>
+          ))}
 
-                  <button onClick={() => removeFromCart(i)}>Remove</button>
-                </div>
-              ))}
+          <h3>Total: R{total}</h3>
 
-              <h3>Total: R{total}</h3>
-
-              <button
-                onClick={() => {
-                  setOrderRef(generateOrderRef());
-                  setView("checkout");
-                }}
-              >
-                Proceed to Checkout
-              </button>
-            </>
-          )}
+          <button onClick={() => {
+            setOrderRef(generateOrderRef());
+            setView("checkout");
+          }}>
+            Checkout
+          </button>
         </div>
       )}
 
@@ -204,18 +187,41 @@ export default function App() {
           <p>Reference: {orderRef}</p>
 
           <form onSubmit={handleSubmit}>
-            <input name="name" placeholder="Name" required />
-            <br /><br />
-
-            <input name="email" placeholder="Email" required />
-            <br /><br />
+            <input name="name" placeholder="Name" required /><br /><br />
+            <input name="email" placeholder="Email" required /><br /><br />
 
             <input type="hidden" name="orderRef" value={orderRef} />
 
-            <button type="submit">Submit Order</button>
+            <button type="submit">Submit</button>
           </form>
         </div>
       )}
+
+      {/* ✅ NEW: ORDERS VIEW */}
+      {view === "orders" && (
+        <div style={{ padding: "20px" }}>
+          <h2>📦 Orders</h2>
+
+          {orders.length === 0 ? (
+            <p>No orders yet</p>
+          ) : (
+            orders.map((o, index) => (
+              <div key={index} style={{
+                background: "#fff",
+                padding: "15px",
+                marginBottom: "10px"
+              }}>
+                <p><strong>{o.ref}</strong></p>
+                <p>Total: R{o.total}</p>
+                <p>Status: {o.status}</p>
+                <p>Date: {new Date(o.date).toLocaleString()}</p>
+              </div>
+            ))
+          )}
+        </div>
+      )}
+
     </div>
   );
 }
+``
