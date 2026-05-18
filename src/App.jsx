@@ -22,7 +22,7 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [state, handleSubmit] = useForm("xgodnrrl");
 
-  // ✅ STYLES (MakerWorld inspired)
+  // ✅ DARK THEME
   const containerStyle = {
     fontFamily: "Arial",
     background: "#0f1115",
@@ -155,7 +155,7 @@ export default function App() {
     loadOrders();
   };
 
-  // ✅ STATUS COLOR
+  // ✅ STATUS COLORS
   const getStatusColor = (status) => {
     if (status === "Completed") return "#22c55e";
     if (status === "Printing") return "#3b82f6";
@@ -163,7 +163,7 @@ export default function App() {
     return "#f59e0b";
   };
 
-  // ✅ SUCCESS PAGE
+  // ✅ SUCCESS SCREEN
   if (state.succeeded) {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
@@ -204,11 +204,7 @@ export default function App() {
         </button>
 
         {/* ✅ FIXED LOGO */}
-        <img
-          src={logo}
-          alt="logo"
-          style={{ width: "40px", borderRadius: "50%" }}
-        />
+        <img src={logo} alt="logo" style={{ width: "40px", borderRadius: "50%" }} />
       </div>
 
       <div style={{ padding: "30px" }}>
@@ -220,6 +216,8 @@ export default function App() {
 
             {filteredProducts.map((p) => (
               <div key={p.id} style={cardStyle}>
+                
+                {/* ✅ FIXED IMAGE RENDER */}
                 {p.image ? (
                   <img
                     src={p.image}
@@ -231,7 +229,14 @@ export default function App() {
                     }}
                   />
                 ) : (
-                  <div style={{ height: "140px", background: "#333" }} />
+                  <div
+                    style={{
+                      height: "140px",
+                      background: "#333",
+                      borderRadius: "8px",
+                      marginBottom: "10px"
+                    }}
+                  />
                 )}
 
                 <h3>{p.name}</h3>
