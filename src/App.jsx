@@ -2,7 +2,13 @@ import { useState, useEffect } from "react";
 import { useForm } from "@formspree/react";
 
 import { db } from "./firebase";
-import { collection, addDoc, getDocs } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc
+} from "firebase/firestore";
 
 import logo from "./assets/logo-circle.jpeg";
 
@@ -14,7 +20,6 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [state, handleSubmit] = useForm("xgodnrrl");
 
-  // ✅ PRODUCTS
   const products = [
     {
       id: 1,
@@ -39,16 +44,13 @@ export default function App() {
     },
   ];
 
-  // ✅ SEARCH
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
-  // ✅ ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  // ✅ CART
   const addToCart = (product) => setCart([...cart, product]);
 
   const removeFromCart = (index) => {
@@ -57,12 +59,11 @@ export default function App() {
     setCart(updated);
   };
 
-  // ✅ TOTAL
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER (ONLY ONCE)
+  // ✅ SAVE ORDER
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
@@ -80,17 +81,30 @@ export default function App() {
     }
   }, [state.succeeded]);
 
-  // ✅ LOAD ORDERS
+  // ✅ LOAD ORDERS (WITH DOC ID)
   const loadOrders = async () => {
     const snapshot = await getDocs(collection(db, "orders"));
     const list = [];
-    snapshot.forEach((doc) => list.push(doc.data()));
+    snapshot.forEach((docSnap) => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
     setOrders(list);
   };
 
   useEffect(() => {
     loadOrders();
   }, []);
+
+  // ✅ UPDATE STATUS
+  const updateStatus = async (id, newStatus) => {
+    const orderRefDoc = doc(db, "orders", id);
+
+    await updateDoc(orderRefDoc, {
+      status: newStatus,
+    });
+
+    loadOrders(); // refresh UI
+  };
 
   // ✅ SUCCESS SCREEN
   if (state.succeeded) {
@@ -128,13 +142,13 @@ export default function App() {
         </button>
 
         <button onClick={() => {
-          loadOrders(); // refresh before viewing
+          loadOrders();
           setView("orders");
         }}>
           Orders ({orders.length})
         </button>
 
-        <img src={logo} alt="logo" style={{ width: "40px" }} />
+        {logo}
       </div>
 
       {/* PRODUCTS */}
@@ -149,7 +163,7 @@ export default function App() {
               marginBottom: "10px"
             }}>
               {p.image ? (
-                <img src={p.image} alt={p.name} width="200" />
+                {p.image}
               ) : (
                 <div style={{ height: "140px", background: "#eee" }}>
                   Custom Upload
@@ -173,11 +187,7 @@ export default function App() {
 
           {cart.map((item, i) => (
             <div key={i}>
-              {item.name} -{" "}
-              {typeof item.price === "number"
-                ? `R${item.price}`
-                : item.price}
-
+              {item.name} - {item.price}
               <button onClick={() => removeFromCart(i)}>Remove</button>
             </div>
           ))}
@@ -212,30 +222,38 @@ export default function App() {
         </div>
       )}
 
-      {/* ✅ ORDERS DASHBOARD */}
+      {/* ✅ ORDERS VIEW */}
       {view === "orders" && (
         <div style={{ padding: "20px" }}>
           <h2>📦 Orders</h2>
 
-          {orders.length === 0 ? (
-            <p>No orders</p>
-          ) : (
-            orders.map((o, i) => (
-              <div key={i} style={{
-                background: "#fff",
-                padding: "15px",
-                marginBottom: "10px"
-              }}>
-                <p><strong>{o.ref}</strong></p>
-                <p>Total: R{o.total}</p>
-                <p>Status: {o.status}</p>
-                <p>Date: {new Date(o.date).toLocaleString()}</p>
+          {orders.map((o) => (
+            <div key={o.id} style={{
+              background: "#fff",
+              padding: "15px",
+              marginBottom: "10px"
+            }}>
+              <p><strong>{o.ref}</strong></p>
+              <p>Total: R{o.total}</p>
+              <p>Status: {o.status}</p>
+              <p>Date: {new Date(o.date).toLocaleString()}</p>
+
+              {/* ✅ STATUS BUTTONS */}
+              <div style={{ marginTop: "10px" }}>
+                <button onClick={() => updateStatus(o.id, "Paid")}>
+                  Paid
+                </button>
+                <button onClick={() => updateStatus(o.id, "Printing")}>
+                  Printing
+                </button>
+                <button onClick={() => updateStatus(o.id, "Completed")}>
+                  Completed
+                </button>
               </div>
-            ))
-          )}
+            </div>
+          ))}
         </div>
       )}
-
     </div>
   );
 }
