@@ -2,8 +2,16 @@ import { useState, useEffect } from "react";
 import { useForm } from "@formspree/react";
 
 import { db } from "./firebase";
-import { collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from "firebase/firestore";
+import {
+  collection,
+  addDoc,
+  getDocs,
+  doc,
+  updateDoc,
+  deleteDoc
+} from "firebase/firestore";
 
+// ✅ IMPORT COMPONENTS FROM FOLDER
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -20,29 +28,32 @@ export default function App() {
 
   const [state, handleSubmit] = useForm("xgodnrrl");
 
+  // ✅ GENERATE ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
+  // ✅ TOTAL
   const total = cart.reduce(
     (sum, item) => (typeof item.price === "number" ? sum + item.price : sum),
     0
   );
 
-  // ✅ SAVE ORDER
+  // ✅ SAVE ORDER TO FIREBASE
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
       items: cart,
-      total,
+      total: total,
       status: "Pending Payment",
       date: new Date().toISOString(),
     });
   };
 
+  // ✅ ONLY SAVE ON SUBMIT SUCCESS
   useEffect(() => {
     if (state.succeeded) {
       saveOrder();
-      setCart([]);
+      setCart([]); // clear cart after order
     }
   }, [state.succeeded]);
 
@@ -50,9 +61,11 @@ export default function App() {
   const loadOrders = async () => {
     const snapshot = await getDocs(collection(db, "orders"));
     const list = [];
-    snapshot.forEach((docSnap) =>
-      list.push({ id: docSnap.id, ...docSnap.data() })
-    );
+
+    snapshot.forEach((docSnap) => {
+      list.push({ id: docSnap.id, ...docSnap.data() });
+    });
+
     setOrders(list);
   };
 
@@ -60,22 +73,25 @@ export default function App() {
     loadOrders();
   }, []);
 
+  // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
     await updateDoc(doc(db, "orders", id), { status });
     loadOrders();
   };
 
+  // ✅ DELETE ORDER
   const deleteOrder = async (id) => {
     await deleteDoc(doc(db, "orders", id));
     loadOrders();
   };
 
-  // ✅ SUCCESS PAGE
+  // ✅ SUCCESS SCREEN
   if (state.succeeded) {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
         <h2>{orderRef}</h2>
+        <p>Please use this reference when making payment.</p>
       </div>
     );
   }
@@ -83,6 +99,7 @@ export default function App() {
   return (
     <div>
 
+      {/* ✅ HEADER */}
       <Header
         search={search}
         setSearch={setSearch}
@@ -93,17 +110,23 @@ export default function App() {
 
       <div style={{ padding: "30px" }}>
 
+        {/* ✅ PRODUCTS */}
         {view === "products" && (
-          <Products cart={cart} setCart={setCart} search={search} />
+          <Products
+            cart={cart}
+            setCart={setCart}
+            search={search}
+          />
         )}
 
+        {/* ✅ CART */}
         {view === "cart" && (
           <Cart
             cart={cart}
+            total={total}
             removeItem={(i) =>
               setCart(cart.filter((_, index) => index !== i))
             }
-            total={total}
             startCheckout={() => {
               setOrderRef(generateOrderRef());
               setView("checkout");
@@ -111,6 +134,7 @@ export default function App() {
           />
         )}
 
+        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
           <Checkout
             total={total}
@@ -119,6 +143,7 @@ export default function App() {
           />
         )}
 
+        {/* ✅ ORDERS */}
         {view === "orders" && (
           <Orders
             orders={orders}
