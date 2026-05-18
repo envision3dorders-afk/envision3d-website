@@ -20,13 +20,14 @@ export default function App() {
   const [orders, setOrders] = useState([]);
   const [state, handleSubmit] = useForm("xgodnrrl");
 
+  // ✅ PRODUCTS
   const products = [
     {
       id: 1,
       name: "Custom 3D Print",
       price: "Quote-Based",
       image: null,
-      description: "Upload your own 3D model for custom printing",
+      description: "Upload your own 3D model",
     },
     {
       id: 2,
@@ -40,17 +41,20 @@ export default function App() {
       name: "Miniature Figurine",
       price: 85,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
-      description: "Detailed miniature for collectors",
+      description: "Collector miniature",
     },
   ];
 
+  // ✅ FILTER
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
+  // ✅ ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
+  // ✅ CART
   const addToCart = (product) => setCart([...cart, product]);
 
   const removeFromCart = (index) => {
@@ -63,7 +67,7 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER
+  // ✅ SAVE ORDER (ONCE)
   const saveOrder = async () => {
     await addDoc(collection(db, "orders"), {
       ref: orderRef,
@@ -74,21 +78,22 @@ export default function App() {
     });
   };
 
-  // ✅ PREVENT DUPLICATES
   useEffect(() => {
     if (state.succeeded) {
       saveOrder();
     }
   }, [state.succeeded]);
 
-  // ✅ LOAD ORDERS (WITH DOC ID)
+  // ✅ LOAD ORDERS
   const loadOrders = async () => {
     const snapshot = await getDocs(collection(db, "orders"));
-    const list = [];
+    const data = [];
+
     snapshot.forEach((docSnap) => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
+      data.push({ id: docSnap.id, ...docSnap.data() });
     });
-    setOrders(list);
+
+    setOrders(data);
   };
 
   useEffect(() => {
@@ -96,17 +101,12 @@ export default function App() {
   }, []);
 
   // ✅ UPDATE STATUS
-  const updateStatus = async (id, newStatus) => {
-    const orderRefDoc = doc(db, "orders", id);
-
-    await updateDoc(orderRefDoc, {
-      status: newStatus,
-    });
-
-    loadOrders(); // refresh UI
+  const updateStatus = async (id, status) => {
+    await updateDoc(doc(db, "orders", id), { status });
+    loadOrders();
   };
 
-  // ✅ SUCCESS SCREEN
+  // ✅ SUCCESS PAGE
   if (state.succeeded) {
     return (
       <div style={{ padding: "20px", textAlign: "center" }}>
@@ -148,7 +148,7 @@ export default function App() {
           Orders ({orders.length})
         </button>
 
-        {logo}
+        <img src={logo} alt="logo" style={{ width: "40px" }} />
       </div>
 
       {/* PRODUCTS */}
@@ -163,7 +163,7 @@ export default function App() {
               marginBottom: "10px"
             }}>
               {p.image ? (
-                {p.image}
+                <img src={p.image} alt={p.name} width="200" />
               ) : (
                 <div style={{ height: "140px", background: "#eee" }}>
                   Custom Upload
@@ -172,7 +172,12 @@ export default function App() {
 
               <h3>{p.name}</h3>
               <p>{p.description}</p>
-              <p>{typeof p.price === "number" ? `R${p.price}` : p.price}</p>
+
+              <p>
+                <strong>
+                  {typeof p.price === "number" ? `R${p.price}` : p.price}
+                </strong>
+              </p>
 
               <button onClick={() => addToCart(p)}>Add to Cart</button>
             </div>
@@ -187,7 +192,11 @@ export default function App() {
 
           {cart.map((item, i) => (
             <div key={i}>
-              {item.name} - {item.price}
+              {item.name} -{" "}
+              {typeof item.price === "number"
+                ? `R${item.price}`
+                : item.price}
+
               <button onClick={() => removeFromCart(i)}>Remove</button>
             </div>
           ))}
@@ -217,12 +226,12 @@ export default function App() {
 
             <input type="hidden" name="orderRef" value={orderRef} />
 
-            <button type="submit">Submit</button>
+            <button type="submit">Submit Order</button>
           </form>
         </div>
       )}
 
-      {/* ✅ ORDERS VIEW */}
+      {/* ✅ ORDERS DASHBOARD */}
       {view === "orders" && (
         <div style={{ padding: "20px" }}>
           <h2>📦 Orders</h2>
@@ -239,7 +248,7 @@ export default function App() {
               <p>Date: {new Date(o.date).toLocaleString()}</p>
 
               {/* ✅ STATUS BUTTONS */}
-              <div style={{ marginTop: "10px" }}>
+              <div>
                 <button onClick={() => updateStatus(o.id, "Paid")}>
                   Paid
                 </button>
@@ -254,6 +263,7 @@ export default function App() {
           ))}
         </div>
       )}
+
     </div>
   );
 }
