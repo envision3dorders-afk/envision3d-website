@@ -45,7 +45,7 @@ export default function Products({ cart, setCart, search }) {
           }}
         >
 
-          {/* ✅ ✅ ✅ CORRECT IMAGE */}
+          {/* ✅ ✅ ✅ THIS IS THE REAL FIX */}
           {p.image ? (
             <img
               src={p.image}
