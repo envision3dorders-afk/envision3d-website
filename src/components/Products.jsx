@@ -46,7 +46,7 @@ export default function Products({ cart, setCart, search }) {
           }}
         >
 
-          {/* ✅ ✅ ✅ FIXED IMAGE RENDERING */}
+          {/* ✅ ✅ ✅ CORRECT IMAGE RENDERING */}
           {p.image ? (
             <img
               src={p.image}
@@ -54,8 +54,8 @@ export default function Products({ cart, setCart, search }) {
               style={{
                 width: "100%",
                 maxWidth: "250px",
-                marginBottom: "10px",
-                borderRadius: "8px"
+                borderRadius: "8px",
+                marginBottom: "10px"
               }}
             />
           ) : (
@@ -105,3 +105,4 @@ export default function Products({ cart, setCart, search }) {
     </>
   );
 }
+``
