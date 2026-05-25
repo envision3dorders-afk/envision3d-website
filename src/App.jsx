@@ -11,7 +11,7 @@ import {
   deleteDoc
 } from "firebase/firestore";
 
-// ✅ IMPORT COMPONENTS FROM FOLDER
+// ✅ COMPONENT IMPORTS
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -28,45 +28,52 @@ export default function App() {
 
   const [state, handleSubmit] = useForm("xgodnrrl");
 
-  // ✅ GENERATE ORDER REF
+  // ✅ GENERATE ORDER REFERENCE
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  // ✅ TOTAL
-  const total = cart.reduce(
-    (sum, item) => (typeof item.price === "number" ? sum + item.price : sum),
-    0
-  );
+  // ✅ CALCULATE TOTAL
+  const total = cart.reduce((sum, item) => {
+    return typeof item.price === "number" ? sum + item.price : sum;
+  }, 0);
 
-  // ✅ SAVE ORDER TO FIREBASE
+  // ✅ SAVE ORDER
   const saveOrder = async () => {
-    await addDoc(collection(db, "orders"), {
-      ref: orderRef,
-      items: cart,
-      total: total,
-      status: "Pending Payment",
-      date: new Date().toISOString(),
-    });
+    try {
+      await addDoc(collection(db, "orders"), {
+        ref: orderRef,
+        items: cart,
+        total: total,
+        status: "Pending Payment",
+        date: new Date().toISOString(),
+      });
+    } catch (error) {
+      console.error("Error saving order:", error);
+    }
   };
 
-  // ✅ ONLY SAVE ON SUBMIT SUCCESS
+  // ✅ ONLY SAVE AFTER SUCCESS
   useEffect(() => {
     if (state.succeeded) {
       saveOrder();
-      setCart([]); // clear cart after order
+      setCart([]);
     }
   }, [state.succeeded]);
 
   // ✅ LOAD ORDERS
   const loadOrders = async () => {
-    const snapshot = await getDocs(collection(db, "orders"));
-    const list = [];
+    try {
+      const snapshot = await getDocs(collection(db, "orders"));
+      const list = [];
 
-    snapshot.forEach((docSnap) => {
-      list.push({ id: docSnap.id, ...docSnap.data() });
-    });
+      snapshot.forEach((docSnap) => {
+        list.push({ id: docSnap.id, ...docSnap.data() });
+      });
 
-    setOrders(list);
+      setOrders(list);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
   };
 
   useEffect(() => {
@@ -75,14 +82,22 @@ export default function App() {
 
   // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
-    await updateDoc(doc(db, "orders", id), { status });
-    loadOrders();
+    try {
+      await updateDoc(doc(db, "orders", id), { status });
+      loadOrders();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   // ✅ DELETE ORDER
   const deleteOrder = async (id) => {
-    await deleteDoc(doc(db, "orders", id));
-    loadOrders();
+    try {
+      await deleteDoc(doc(db, "orders", id));
+      loadOrders();
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
   };
 
   // ✅ SUCCESS SCREEN
@@ -90,7 +105,7 @@ export default function App() {
     return (
       <div style={{ padding: "40px", textAlign: "center" }}>
         <h1>✅ Order Received</h1>
-        <h2>{orderRef}</h2>
+        <h2 style={{ color: "#3b82f6" }}>{orderRef}</h2>
         <p>Please use this reference when making payment.</p>
       </div>
     );
@@ -110,7 +125,7 @@ export default function App() {
 
       <div style={{ padding: "30px" }}>
 
-        {/* ✅ PRODUCTS */}
+        {/* ✅ PRODUCTS VIEW */}
         {view === "products" && (
           <Products
             cart={cart}
@@ -119,7 +134,7 @@ export default function App() {
           />
         )}
 
-        {/* ✅ CART */}
+        {/* ✅ CART VIEW */}
         {view === "cart" && (
           <Cart
             cart={cart}
@@ -134,7 +149,7 @@ export default function App() {
           />
         )}
 
-        {/* ✅ CHECKOUT */}
+        {/* ✅ CHECKOUT VIEW */}
         {view === "checkout" && (
           <Checkout
             total={total}
@@ -143,7 +158,7 @@ export default function App() {
           />
         )}
 
-        {/* ✅ ORDERS */}
+        {/* ✅ ORDERS VIEW */}
         {view === "orders" && (
           <Orders
             orders={orders}
