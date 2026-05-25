@@ -24,7 +24,6 @@ export default function Products({ cart, setCart, search }) {
     }
   ];
 
-  // ✅ FILTER PRODUCTS
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -46,14 +45,14 @@ export default function Products({ cart, setCart, search }) {
           }}
         >
 
-          {/* ✅ ✅ ✅ CORRECT IMAGE RENDERING */}
+          {/* ✅ ✅ ✅ CORRECT IMAGE */}
           {p.image ? (
             <img
               src={p.image}
               alt={p.name}
               style={{
                 width: "100%",
-                maxWidth: "250px",
+                maxWidth: "200px",
                 borderRadius: "8px",
                 marginBottom: "10px"
               }}
@@ -105,4 +104,3 @@ export default function Products({ cart, setCart, search }) {
     </>
   );
 }
-``
