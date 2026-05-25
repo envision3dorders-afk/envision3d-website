@@ -14,10 +14,18 @@ export default function Products({ cart, setCart, search }) {
       price: 120,
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand"
+    },
+    {
+      id: 3,
+      name: "Miniature Figurine",
+      price: 85,
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      description: "Mini collectible"
     }
   ];
 
-  const filtered = products.filter((p) =>
+  // ✅ FILTER PRODUCTS
+  const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
 
@@ -25,23 +33,75 @@ export default function Products({ cart, setCart, search }) {
     <>
       <h2>Products</h2>
 
-      {filtered.map((p) => (
-        <div key={p.id}>
+      {filteredProducts.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            background: "#1c1f26",
+            padding: "20px",
+            marginBottom: "15px",
+            borderRadius: "12px",
+            border: "1px solid #2a2e37",
+            color: "#e5e7eb"
+          }}
+        >
+
+          {/* ✅ ✅ ✅ FIXED IMAGE RENDERING */}
           {p.image ? (
-            {p.image}
+            <img
+              src={p.image}
+              alt={p.name}
+              style={{
+                width: "100%",
+                maxWidth: "250px",
+                marginBottom: "10px",
+                borderRadius: "8px"
+              }}
+            />
           ) : (
-            <div style={{ height: "140px", background: "#333" }} />
+            <div
+              style={{
+                height: "140px",
+                background: "#333",
+                borderRadius: "8px",
+                marginBottom: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                color: "#aaa"
+              }}
+            >
+              Custom Upload
+            </div>
           )}
 
           <h3>{p.name}</h3>
           <p>{p.description}</p>
 
-          <button onClick={() => setCart([...cart, p])}>
+          <p>
+            <strong>
+              {typeof p.price === "number"
+                ? `R${p.price}`
+                : p.price}
+            </strong>
+          </p>
+
+          <button
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              background: "#3b82f6",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer"
+            }}
+            onClick={() => setCart([...cart, p])}
+          >
             Add to Cart
           </button>
+
         </div>
       ))}
     </>
   );
 }
-``
