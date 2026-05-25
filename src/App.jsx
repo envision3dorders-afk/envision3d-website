@@ -1,173 +1,107 @@
-import { useState, useEffect } from "react";
-import { useForm } from "@formspree/react";
+export default function Products({ cart, setCart, search }) {
 
-import { db } from "./firebase";
-import {
-  collection,
-  addDoc,
-  getDocs,
-  doc,
-  updateDoc,
-  deleteDoc
-} from "firebase/firestore";
-
-// ✅ COMPONENT IMPORTS
-import Header from "./components/Header";
-import Products from "./components/Products";
-import Cart from "./components/Cart";
-import Checkout from "./components/Checkout";
-import Orders from "./components/Orders";
-
-export default function App() {
-
-  const [search, setSearch] = useState("");
-  const [cart, setCart] = useState([]);
-  const [view, setView] = useState("products");
-  const [orderRef, setOrderRef] = useState("");
-  const [orders, setOrders] = useState([]);
-
-  const [state, handleSubmit] = useForm("xgodnrrl");
-
-  // ✅ GENERATE ORDER REFERENCE
-  const generateOrderRef = () =>
-    "ENV-" + Math.floor(10000 + Math.random() * 90000);
-
-  // ✅ CALCULATE TOTAL
-  const total = cart.reduce((sum, item) => {
-    return typeof item.price === "number" ? sum + item.price : sum;
-  }, 0);
-
-  // ✅ SAVE ORDER
-  const saveOrder = async () => {
-    try {
-      await addDoc(collection(db, "orders"), {
-        ref: orderRef,
-        items: cart,
-        total: total,
-        status: "Pending Payment",
-        date: new Date().toISOString(),
-      });
-    } catch (error) {
-      console.error("Error saving order:", error);
+  // ✅ PRODUCTS DATA
+  const products = [
+    {
+      id: 1,
+      name: "Custom 3D Print",
+      price: "Quote-Based",
+      image: null,
+      description: "Upload your own 3D model"
+    },
+    {
+      id: 2,
+      name: "Phone Stand",
+      price: 120,
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      description: "Compact stand"
+    },
+    {
+      id: 3,
+      name: "Miniature Figurine",
+      price: 85,
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      description: "Mini collectible"
     }
-  };
+  ];
 
-  // ✅ ONLY SAVE AFTER SUCCESS
-  useEffect(() => {
-    if (state.succeeded) {
-      saveOrder();
-      setCart([]);
-    }
-  }, [state.succeeded]);
-
-  // ✅ LOAD ORDERS
-  const loadOrders = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "orders"));
-      const list = [];
-
-      snapshot.forEach((docSnap) => {
-        list.push({ id: docSnap.id, ...docSnap.data() });
-      });
-
-      setOrders(list);
-    } catch (error) {
-      console.error("Error loading orders:", error);
-    }
-  };
-
-  useEffect(() => {
-    loadOrders();
-  }, []);
-
-  // ✅ UPDATE STATUS
-  const updateStatus = async (id, status) => {
-    try {
-      await updateDoc(doc(db, "orders", id), { status });
-      loadOrders();
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
-  };
-
-  // ✅ DELETE ORDER
-  const deleteOrder = async (id) => {
-    try {
-      await deleteDoc(doc(db, "orders", id));
-      loadOrders();
-    } catch (error) {
-      console.error("Error deleting order:", error);
-    }
-  };
-
-  // ✅ SUCCESS SCREEN
-  if (state.succeeded) {
-    return (
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h1>✅ Order Received</h1>
-        <h2 style={{ color: "#3b82f6" }}>{orderRef}</h2>
-        <p>Please use this reference when making payment.</p>
-      </div>
-    );
-  }
+  // ✅ FILTER PRODUCTS
+  const filteredProducts = products.filter((p) =>
+    p.name.toLowerCase().includes(search.toLowerCase())
+  );
 
   return (
-    <div>
+    <>
+      <h2>Products</h2>
 
-      {/* ✅ HEADER */}
-      <Header
-        search={search}
-        setSearch={setSearch}
-        cart={cart}
-        orders={orders}
-        setView={setView}
-      />
+      {filteredProducts.map((p) => (
+        <div
+          key={p.id}
+          style={{
+            background: "#1c1f26",
+            padding: "20px",
+            marginBottom: "15px",
+            borderRadius: "12px",
+            border: "1px solid #2a2e37",
+            color: "#e5e7eb"
+          }}
+        >
 
-      <div style={{ padding: "30px" }}>
+          {/* ✅ ✅ FIXED IMAGE RENDERING */}
+          {p.image ? (
+            <img
+              src={p.image}
+              alt={p.name}
+              style={{
+                width: "100%",
+                maxWidth: "200px",
+                borderRadius: "8px",
+                marginBottom: "10px"
+              }}
+            />
+          ) : (
+            <div
+              style={{
+                height: "140px",
+                background: "#333",
+                borderRadius: "8px",
+                marginBottom: "10px",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center"
+              }}
+            >
+              Custom Upload
+            </div>
+          )}
 
-        {/* ✅ PRODUCTS VIEW */}
-        {view === "products" && (
-          <Products
-            cart={cart}
-            setCart={setCart}
-            search={search}
-          />
-        )}
+          <h3>{p.name}</h3>
+          <p>{p.description}</p>
 
-        {/* ✅ CART VIEW */}
-        {view === "cart" && (
-          <Cart
-            cart={cart}
-            total={total}
-            removeItem={(i) =>
-              setCart(cart.filter((_, index) => index !== i))
-            }
-            startCheckout={() => {
-              setOrderRef(generateOrderRef());
-              setView("checkout");
+          <p>
+            <strong>
+              {typeof p.price === "number"
+                ? `R${p.price}`
+                : p.price}
+            </strong>
+          </p>
+
+          <button
+            style={{
+              padding: "8px 12px",
+              borderRadius: "6px",
+              background: "#3b82f6",
+              color: "#fff",
+              border: "none",
+              cursor: "pointer"
             }}
-          />
-        )}
+            onClick={() => setCart([...cart, p])}
+          >
+            Add to Cart
+          </button>
 
-        {/* ✅ CHECKOUT VIEW */}
-        {view === "checkout" && (
-          <Checkout
-            total={total}
-            orderRef={orderRef}
-            handleSubmit={handleSubmit}
-          />
-        )}
-
-        {/* ✅ ORDERS VIEW */}
-        {view === "orders" && (
-          <Orders
-            orders={orders}
-            updateStatus={updateStatus}
-            deleteOrder={deleteOrder}
-          />
-        )}
-
-      </div>
-    </div>
+        </div>
+      ))}
+    </>
   );
 }
