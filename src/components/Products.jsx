@@ -47,16 +47,7 @@ export default function Products({ cart, setCart, search }) {
 
           {/* ✅ ✅ ✅ THIS IS THE REAL FIX */}
           {p.image ? (
-            <img
-              src={p.image}
-              alt={p.name}
-              style={{
-                width: "100%",
-                maxWidth: "200px",
-                borderRadius: "8px",
-                marginBottom: "10px"
-              }}
-            />
+            {p.image}
           ) : (
             <div
               style={{
