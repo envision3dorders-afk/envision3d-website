@@ -45,9 +45,19 @@ export default function Products({ cart, setCart, search }) {
           }}
         >
 
-          {/* ✅ ✅ ✅ THIS IS THE REAL FIX */}
+          {/* ✅ ✅ ✅ CORRECT IMAGE HANDLING */}
           {p.image ? (
-            {p.image}
+            <img
+              src={p.image}
+              alt={p.name}
+              style={{
+                width: "100%",
+                height: "140px",
+                objectFit: "cover",
+                borderRadius: "8px",
+                marginBottom: "10px"
+              }}
+            />
           ) : (
             <div
               style={{
@@ -56,8 +66,8 @@ export default function Products({ cart, setCart, search }) {
                 borderRadius: "8px",
                 marginBottom: "10px",
                 display: "flex",
-                alignItems: "center",
                 justifyContent: "center",
+                alignItems: "center",
                 color: "#aaa"
               }}
             >
