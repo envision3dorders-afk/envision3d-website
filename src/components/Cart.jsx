@@ -1,4 +1,7 @@
-export default function Cart({ cart, removeItem, total, startCheckout }) {export defaulth2>Cart</h2>
+export default function Cart({ cart, removeItem, total, startCheckout }) {
+  return (
+    <>
+      <h2>Cart</h2>
 
       {cart.map((item, i) => (
         <div key={i}>
@@ -15,6 +18,3 @@ export default function Cart({ cart, removeItem, total, startCheckout }) {export
     </>
   );
 }
-
-  return (
-    <>
