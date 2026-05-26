@@ -1,7 +1,6 @@
 import logo from "../assets/logo-circle.jpeg";
 
 export default function Header({ search, setSearch, cart, orders, setView }) {
-
   return (
     <div style={{
       display: "flex",
@@ -29,7 +28,7 @@ export default function Header({ search, setSearch, cart, orders, setView }) {
         Orders ({orders.length})
       </button>
 
-      {logo}
+      <img src={logo} alt="logo" style={{ width: "40px" }} />
     </div>
   );
 }
