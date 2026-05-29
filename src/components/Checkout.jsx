@@ -16,10 +16,7 @@ export default function Checkout({ total, orderRef }) {
       <p>Reference: {orderRef}</p>
 
       {/* ✅ PayFast Payment Form */}
-      <form
-        action="https://sandbox.payfast.co.za/eng/process"
-        method="post"
-      >
+      https://sandbox.payfast.co.za/eng/process
         {/* PayFast required fields */}
         <input type="hidden" name="merchant_id" value={merchant_id} />
         <input type="hidden" name="merchant_key" value={merchant_key} />
@@ -77,4 +74,3 @@ export default function Checkout({ total, orderRef }) {
     </div>
   );
 }
-``
