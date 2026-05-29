@@ -1,5 +1,4 @@
 import { useState, useEffect } from "react";
-import { useForm } from "@formspree/react";
 
 import { db } from "./firebase";
 import {
@@ -25,8 +24,6 @@ export default function App() {
   const [orderRef, setOrderRef] = useState("");
   const [orders, setOrders] = useState([]);
 
-  const [state, handleSubmit] = useForm("xgodnrrl");
-
   // ✅ GENERATE ORDER REF
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
@@ -36,35 +33,7 @@ export default function App() {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ SAVE ORDER
-  const saveOrder = async () => {
-    const newRef = orderRef || generateOrderRef();
-
-    try {
-      await addDoc(collection(db, "orders"), {
-        ref: newRef,
-        items: cart,
-        total: total,
-        status: "Pending Payment",
-        date: new Date().toISOString(),
-      });
-
-      setOrderRef(newRef);
-      await loadOrders(); // ✅ refresh list immediately
-    } catch (error) {
-      console.error("Error saving order:", error);
-    }
-  };
-
-  // ✅ TRIGGER SAVE ONLY ON SUCCESS
-  useEffect(() => {
-    if (state.succeeded) {
-      saveOrder();
-      setCart([]);
-    }
-  }, [state.succeeded]);
-
-  // ✅ LOAD ORDERS
+  // ✅ LOAD ORDERS FROM FIREBASE
   const loadOrders = async () => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
@@ -103,16 +72,25 @@ export default function App() {
     }
   };
 
-  // ✅ SUCCESS PAGE
-  if (state.succeeded) {
-    return (
-      <div style={{ padding: "40px", textAlign: "center" }}>
-        <h1>✅ Order Received</h1>
-        <h2 style={{ color: "#3b82f6" }}>{orderRef}</h2>
-        <p>Please use this reference when making payment.</p>
-      </div>
-    );
-  }
+  // ✅ START CHECKOUT (SAVE ORDER BEFORE PAYMENT)
+  const startCheckout = async () => {
+    const ref = generateOrderRef();
+    setOrderRef(ref);
+
+    try {
+      await addDoc(collection(db, "orders"), {
+        ref: ref,
+        items: cart,
+        total: total,
+        status: "Pending Payment",
+        date: new Date().toISOString(),
+      });
+
+      setView("checkout");
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
+  };
 
   return (
     <div>
@@ -139,20 +117,13 @@ export default function App() {
             removeItem={(i) =>
               setCart(cart.filter((_, index) => index !== i))
             }
-            startCheckout={() => {
-              setOrderRef(generateOrderRef());
-              setView("checkout");
-            }}
+            startCheckout={startCheckout} // ✅ UPDATED
           />
         )}
 
-        {/* ✅ CHECKOUT */}
+        {/* ✅ CHECKOUT (PAYFAST) */}
         {view === "checkout" && (
-          <Checkout
-            total={total}
-            orderRef={orderRef}
-            handleSubmit={handleSubmit}
-          />
+          <Checkout total={total} orderRef={orderRef} />
         )}
 
         {/* ✅ ORDERS */}
