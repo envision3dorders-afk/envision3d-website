@@ -38,14 +38,19 @@ export default function App() {
 
   // ✅ SAVE ORDER
   const saveOrder = async () => {
+    const newRef = orderRef || generateOrderRef();
+
     try {
       await addDoc(collection(db, "orders"), {
-        ref: orderRef,
+        ref: newRef,
         items: cart,
         total: total,
         status: "Pending Payment",
         date: new Date().toISOString(),
       });
+
+      setOrderRef(newRef);
+      await loadOrders(); // ✅ refresh list immediately
     } catch (error) {
       console.error("Error saving order:", error);
     }
@@ -63,11 +68,10 @@ export default function App() {
   const loadOrders = async () => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
-      const list = [];
-
-      snapshot.forEach((docSnap) => {
-        list.push({ id: docSnap.id, ...docSnap.data() });
-      });
+      const list = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
 
       setOrders(list);
     } catch (error) {
