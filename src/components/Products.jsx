@@ -1,29 +1,32 @@
 export default function Products({ cart, setCart, search }) {
-
+  // ✅ PRODUCTS DATA
   const products = [
     {
       id: 1,
       name: "Custom 3D Print",
       price: "Quote-Based",
       image: null,
-      description: "Upload your own 3D model"
+      description: "Upload your own 3D model",
     },
     {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
-      description: "Compact stand"
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      description: "Compact stand",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
-      description: "Mini collectible"
-    }
+      image:
+        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      description: "Mini collectible",
+    },
   ];
 
+  // ✅ FILTER PRODUCTS
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -41,21 +44,19 @@ export default function Products({ cart, setCart, search }) {
             marginBottom: "15px",
             borderRadius: "12px",
             border: "1px solid #2a2e37",
-            color: "#e5e7eb"
+            color: "#e5e7eb",
           }}
         >
-
-          {/* ✅ ✅ ✅ CORRECT IMAGE HANDLING */}
+          {/* ✅ IMAGE OR FALLBACK */}
           {p.image ? (
             <img
               src={p.image}
               alt={p.name}
               style={{
                 width: "100%",
-                height: "140px",
-                objectFit: "cover",
+                maxWidth: "200px",
                 borderRadius: "8px",
-                marginBottom: "10px"
+                marginBottom: "10px",
               }}
             />
           ) : (
@@ -66,9 +67,8 @@ export default function Products({ cart, setCart, search }) {
                 borderRadius: "8px",
                 marginBottom: "10px",
                 display: "flex",
-                justifyContent: "center",
                 alignItems: "center",
-                color: "#aaa"
+                justifyContent: "center",
               }}
             >
               Custom Upload
@@ -80,9 +80,7 @@ export default function Products({ cart, setCart, search }) {
 
           <p>
             <strong>
-              {typeof p.price === "number"
-                ? `R${p.price}`
-                : p.price}
+              {typeof p.price === "number" ? `R${p.price}` : p.price}
             </strong>
           </p>
 
@@ -93,13 +91,12 @@ export default function Products({ cart, setCart, search }) {
               background: "#3b82f6",
               color: "#fff",
               border: "none",
-              cursor: "pointer"
+              cursor: "pointer",
             }}
             onClick={() => setCart([...cart, p])}
           >
             Add to Cart
           </button>
-
         </div>
       ))}
     </>
