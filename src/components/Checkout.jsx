@@ -1,4 +1,10 @@
-export default function Checkout({ total, orderRef, handleSubmit }) {
+export default function Checkout({ total, orderRef }) {
+  const merchant_id = "10000100"; // Sandbox default
+  const merchant_key = "46f0cd694581a"; // Sandbox default
+  const return_url = "https://your-site.vercel.app";
+  const cancel_url = "https://your-site.vercel.app";
+  const notify_url = "https://your-site.vercel.app"; // later we improve this
+
   return (
     <div>
       <h2>Checkout</h2>
@@ -6,53 +12,42 @@ export default function Checkout({ total, orderRef, handleSubmit }) {
       <p>Total: R{total}</p>
       <p>Reference: {orderRef}</p>
 
-      <form onSubmit={handleSubmit}>
-        <div style={{ marginBottom: "10px" }}>
-          <input
-            name="name"
-            placeholder="Name"
-            required
-            style={{
-              padding: "10px",
-              width: "100%",
-              maxWidth: "300px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
-          />
-        </div>
+      <form
+        action="https://sandbox.payfast.co.za/eng/process"
+        method="post"
+      >
+        <input type="hidden" name="merchant_id" value={merchant_id} />
+        <input type="hidden" name="merchant_key" value={merchant_key} />
+
+        <input type="hidden" name="return_url" value={return_url} />
+        <input type="hidden" name="cancel_url" value={cancel_url} />
+        <input type="hidden" name="notify_url" value={notify_url} />
+
+        <input type="hidden" name="amount" value={total} />
+        <input type="hidden" name="item_name" value="Envision3D Order" />
+        <input type="hidden" name="m_payment_id" value={orderRef} />
 
         <div style={{ marginBottom: "10px" }}>
           <input
             type="email"
-            name="email"
+            name="email_address"
             placeholder="Email"
             required
-            style={{
-              padding: "10px",
-              width: "100%",
-              maxWidth: "300px",
-              borderRadius: "6px",
-              border: "1px solid #ccc",
-            }}
           />
         </div>
-
-        {/* ✅ Hidden reference sent to Formspree */}
-        <input type="hidden" name="orderRef" value={orderRef} />
 
         <button
           type="submit"
           style={{
             padding: "10px 15px",
-            borderRadius: "6px",
-            background: "#3b82f6",
+            background: "#16a34a",
             color: "#fff",
             border: "none",
+            borderRadius: "6px",
             cursor: "pointer",
           }}
         >
-          Submit Order
+          Pay Now
         </button>
       </form>
     </div>
