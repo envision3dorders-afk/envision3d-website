@@ -10,7 +10,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-// ✅ COMPONENTS
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -22,112 +21,88 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
 
-  // ✅ IMPORTANT: this now stores the FIRESTORE ID (not just ref)
-  const [orderId, setOrderId] = useState("");
-
+  const [currentOrderId, setCurrentOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
 
-  // ✅ Generate display reference
+  // ✅ Generate readable order reference
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  // ✅ Calculate total
-  const total = cart.reduce((sum, item) => {
-    return typeof item.price === "number" ? sum + item.price : sum;
-  }, 0);
+  const total = cart.reduce(
+    (sum, item) =>
+      typeof item.price === "number" ? sum + item.price : sum,
+    0
+  );
 
-  // ✅ Load orders
+  // ✅ LOAD ORDERS
   const loadOrders = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "orders"));
-      const list = snapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }));
-
-      setOrders(list);
-    } catch (error) {
-      console.error("Error loading orders:", error);
-    }
+    const snapshot = await getDocs(collection(db, "orders"));
+    const list = snapshot.docs.map((d) => ({
+      id: d.id,
+      ...d.data(),
+    }));
+    setOrders(list);
   };
 
   useEffect(() => {
     loadOrders();
   }, []);
 
-  // ✅ START CHECKOUT (CREATE ORDER FIRST)
+  // ✅ CREATE ORDER
   const startCheckout = async () => {
     const ref = generateOrderRef();
 
-    try {
-      const docRef = await addDoc(collection(db, "orders"), {
-        ref,
-        items: cart,
-        total,
-        status: total > 0 ? "Pending Payment" : "Quote Required",
-        date: new Date().toISOString(),
-      });
+    const docRef = await addDoc(collection(db, "orders"), {
+      ref,
+      items: cart,
+      total,
+      status: total > 0 ? "Pending Payment" : "Quote Required",
+      date: new Date().toISOString(),
+    });
 
-      // ✅ SAVE THE REAL ORDER ID
-      setOrderId(docRef.id);
+    // ✅ Save correct Firestore ID
+    setCurrentOrderId(docRef.id);
 
-      setView("checkout");
-    } catch (error) {
-      console.error("Error creating order:", error);
-    }
+    setView("checkout");
   };
 
-  // ✅ HANDLE FILE + LINK (FIXED)
+  // ✅ FILE / LINK SAVE (FIXED)
   const handleFileUpload = async ({ fileURL, modelLink }) => {
-    try {
-      // ✅ UPDATE THE EXACT ORDER (NO MORE "LAST ORDER" LOGIC)
-      await updateDoc(doc(db, "orders", orderId), {
-        fileURL: fileURL || null,
-        modelLink: modelLink || null,
-        status: "Quote Required",
-      });
-
-      await loadOrders();
-
-      setCart([]);
-      setView("orders");
-    } catch (error) {
-      console.error("Error updating order:", error);
+    if (!currentOrderId) {
+      console.error("No order ID found");
+      return;
     }
+
+    await updateDoc(doc(db, "orders", currentOrderId), {
+      fileURL: fileURL || null,
+      modelLink: modelLink || null,
+    });
+
+    await loadOrders();
+
+    setCart([]);
+    setView("orders");
   };
 
-  // ✅ SET PRICE (ADMIN)
+  // ✅ SET PRICE
   const setPrice = async (id, price) => {
-    try {
-      await updateDoc(doc(db, "orders", id), {
-        total: price,
-        status: "Pending Payment",
-      });
-
-      loadOrders();
-    } catch (error) {
-      console.error("Error setting price:", error);
-    }
+    await updateDoc(doc(db, "orders", id), {
+      total: price,
+      status: "Pending Payment",
+    });
+    loadOrders();
   };
 
-  // ✅ UPDATE STATUS
+  // ✅ STATUS UPDATE
   const updateStatus = async (id, status) => {
-    try {
-      await updateDoc(doc(db, "orders", id), { status });
-      loadOrders();
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
+    await updateDoc(doc(db, "orders", id), { status });
+    loadOrders();
   };
 
-  // ✅ DELETE ORDER
+  // ✅ DELETE
   const deleteOrder = async (id) => {
-    try {
-      await deleteDoc(doc(db, "orders", id));
-      loadOrders();
-    } catch (error) {
-      console.error("Error deleting order:", error);
-    }
+    await deleteDoc(doc(db, "orders", id));
+    loadOrders();
   };
 
   return (
@@ -141,7 +116,6 @@ export default function App() {
       />
 
       <div style={{ padding: "30px" }}>
-        {/* ✅ PRODUCTS */}
         {view === "products" && (
           <Products
             cart={cart}
@@ -151,28 +125,25 @@ export default function App() {
           />
         )}
 
-        {/* ✅ CART */}
         {view === "cart" && (
           <Cart
             cart={cart}
             total={total}
             removeItem={(i) =>
-              setCart(cart.filter((_, index) => index !== i))
+              setCart(cart.filter((_, idx) => idx !== i))
             }
             startCheckout={startCheckout}
           />
         )}
 
-        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
           <Checkout
             total={total}
-            orderRef={orderId}
+            orderRef={currentOrderId}
             onFileUpload={handleFileUpload}
           />
         )}
 
-        {/* ✅ ORDERS */}
         {view === "orders" && (
           <Orders
             orders={orders}
