@@ -22,10 +22,12 @@ export default function App() {
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
 
+  // ✅ Store Firestore document ID
   const [currentOrderId, setCurrentOrderId] = useState(null);
+
   const [orders, setOrders] = useState([]);
 
-  // ✅ Generate order ref
+  // ✅ Generate nice-looking order ref
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
@@ -41,7 +43,7 @@ export default function App() {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
 
-      console.log("Orders loaded:", snapshot.docs.length); // ✅ DEBUG
+      console.log("Orders loaded:", snapshot.docs.length);
 
       const list = snapshot.docs.map((docSnap) => ({
         id: docSnap.id,
@@ -58,22 +60,23 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ CREATE ORDER (FIXED)
+  // ✅ CREATE ORDER
   const startCheckout = async () => {
     const ref = generateOrderRef();
 
-    console.log("Creating order..."); // ✅ DEBUG
+    console.log("Creating order...");
 
     try {
       const docRef = await addDoc(collection(db, "orders"), {
         ref,
         items: cart,
         total,
-        status: total > 0 ? "Pending Payment" : "Quote Required",
+        // ✅ FIXED LOGIC
+        status: total === 0 ? "Quote Required" : "Pending Payment",
         date: new Date().toISOString(),
       });
 
-      console.log("Order created with ID:", docRef.id); // ✅ DEBUG
+      console.log("Order created:", docRef.id);
 
       setCurrentOrderId(docRef.id);
 
@@ -83,7 +86,7 @@ export default function App() {
     }
   };
 
-  // ✅ HANDLE FILE / LINK
+  // ✅ HANDLE FILE / LINK SUBMISSION
   const handleFileUpload = async ({ fileURL, modelLink }) => {
     if (!currentOrderId) {
       console.error("No order ID found!");
@@ -91,23 +94,24 @@ export default function App() {
     }
 
     try {
-      console.log("Updating order:", currentOrderId); // ✅ DEBUG
+      console.log("Updating order:", currentOrderId);
 
       await updateDoc(doc(db, "orders", currentOrderId), {
         fileURL: fileURL || null,
         modelLink: modelLink || null,
+        status: "Quote Required",
       });
 
       await loadOrders();
 
-      setCart([]);
-      setView("orders");
+      setCart([]); // ✅ clear cart
+      setView("orders"); // ✅ go to Orders screen
     } catch (error) {
       console.error("Error updating order:", error);
     }
   };
 
-  // ✅ SET PRICE
+  // ✅ ADMIN: SET PRICE
   const setPrice = async (id, price) => {
     try {
       await updateDoc(doc(db, "orders", id), {
@@ -143,6 +147,7 @@ export default function App() {
 
   return (
     <div>
+      {/* ✅ HEADER */}
       <Header
         search={search}
         setSearch={setSearch}
@@ -170,7 +175,7 @@ export default function App() {
             removeItem={(i) =>
               setCart(cart.filter((_, idx) => idx !== i))
             }
-            startCheckout={startCheckout} // ✅ IMPORTANT
+            startCheckout={startCheckout}
           />
         )}
 
@@ -196,4 +201,3 @@ export default function App() {
     </div>
   );
 }
-``
