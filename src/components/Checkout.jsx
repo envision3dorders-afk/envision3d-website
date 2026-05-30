@@ -1,27 +1,49 @@
 import { useState } from "react";
+import { storage } from "../firebase";
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function Checkout({ total, orderRef, onFileUpload }) {
   const [file, setFile] = useState(null);
   const [link, setLink] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const merchant_id = "10000100";
-  const merchant_key = "46f0cd694581a";
+  const uploadFile = async () => {
+    if (!file) return null;
 
-  const return_url =
-    "https://envision3d-website-jivechjaa-orders-6322s-projects.vercel.app";
+    setLoading(true);
 
-  const handleQuote = () => {
-    if (!file && !link) {
-      alert("Please upload a file or paste a link");
+    try {
+      const storageRef = ref(
+        storage,
+        `models/${Date.now()}_${file.name}`
+      );
+
+      await uploadBytes(storageRef, file);
+      const url = await getDownloadURL(storageRef);
+
+      setLoading(false);
+      return url;
+    } catch (err) {
+      console.error("Upload error:", err);
+      setLoading(false);
+      return null;
+    }
+  };
+
+  const handleQuote = async () => {
+    const fileURL = await uploadFile();
+
+    if (!fileURL && !link) {
+      alert("Upload a file or provide a link");
       return;
     }
 
-    onFileUpload({
-      file,
+    await onFileUpload({
+      fileURL,
       modelLink: link,
     });
 
-    alert("Quote request submitted ✅");
+    alert("✅ Quote request submitted!");
   };
 
   return (
@@ -31,16 +53,16 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       <p>Total: R{total}</p>
       <p>Reference: {orderRef}</p>
 
-      {/* ✅ FILE */}
-      <div style={{ marginBottom: "10px" }}>
+      {/* FILE */}
+      <div>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
         />
       </div>
 
-      {/* ✅ LINK */}
-      <div style={{ marginBottom: "10px" }}>
+      {/* LINK */}
+      <div>
         <input
           type="text"
           placeholder="Paste model link"
@@ -49,32 +71,11 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ PAYMENT OR QUOTE */}
-      {total > 0 ? (
-        <form
-          action="https://sandbox.payfast.co.za/eng/process"
-          method="post"
-        >
-          <input type="hidden" name="merchant_id" value={merchant_id} />
-          <input type="hidden" name="merchant_key" value={merchant_key} />
-
-          <input type="hidden" name="return_url" value={return_url} />
-
-          <input type="hidden" name="amount" value={total} />
-          <input type="hidden" name="item_name" value="Order" />
-          <input type="hidden" name="m_payment_id" value={orderRef} />
-
-          <input
-            type="email"
-            name="email_address"
-            placeholder="Email"
-            required
-          />
-
-          <button type="submit">Pay Now</button>
-        </form>
-      ) : (
-        <button onClick={handleQuote}>Request Quote</button>
+      {/* QUOTE ONLY (for custom orders) */}
+      {total === 0 && (
+        <button onClick={handleQuote} disabled={loading}>
+          {loading ? "Uploading..." : "Request Quote"}
+        </button>
       )}
     </div>
   );
