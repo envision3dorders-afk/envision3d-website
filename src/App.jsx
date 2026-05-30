@@ -21,16 +21,22 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
-  const [orderRef, setOrderRef] = useState("");
+
+  // ✅ IMPORTANT: this now stores the FIRESTORE ID (not just ref)
+  const [orderId, setOrderId] = useState("");
+
   const [orders, setOrders] = useState([]);
 
+  // ✅ Generate display reference
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
+  // ✅ Calculate total
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
+  // ✅ Load orders
   const loadOrders = async () => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
@@ -41,7 +47,7 @@ export default function App() {
 
       setOrders(list);
     } catch (error) {
-      console.error(error);
+      console.error("Error loading orders:", error);
     }
   };
 
@@ -49,23 +55,48 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ START CHECKOUT
+  // ✅ START CHECKOUT (CREATE ORDER FIRST)
   const startCheckout = async () => {
     const ref = generateOrderRef();
-    setOrderRef(ref);
 
-    await addDoc(collection(db, "orders"), {
-      ref,
-      items: cart,
-      total,
-      status: total > 0 ? "Pending Payment" : "Quote Required",
-      date: new Date().toISOString(),
-    });
+    try {
+      const docRef = await addDoc(collection(db, "orders"), {
+        ref,
+        items: cart,
+        total,
+        status: total > 0 ? "Pending Payment" : "Quote Required",
+        date: new Date().toISOString(),
+      });
 
-    setView("checkout");
+      // ✅ SAVE THE REAL ORDER ID
+      setOrderId(docRef.id);
+
+      setView("checkout");
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
   };
 
-  // ✅ SET PRICE (NEW FUNCTION)
+  // ✅ HANDLE FILE + LINK (FIXED)
+  const handleFileUpload = async ({ fileURL, modelLink }) => {
+    try {
+      // ✅ UPDATE THE EXACT ORDER (NO MORE "LAST ORDER" LOGIC)
+      await updateDoc(doc(db, "orders", orderId), {
+        fileURL: fileURL || null,
+        modelLink: modelLink || null,
+        status: "Quote Required",
+      });
+
+      await loadOrders();
+
+      setCart([]);
+      setView("orders");
+    } catch (error) {
+      console.error("Error updating order:", error);
+    }
+  };
+
+  // ✅ SET PRICE (ADMIN)
   const setPrice = async (id, price) => {
     try {
       await updateDoc(doc(db, "orders", id), {
@@ -75,7 +106,7 @@ export default function App() {
 
       loadOrders();
     } catch (error) {
-      console.error(error);
+      console.error("Error setting price:", error);
     }
   };
 
@@ -85,39 +116,17 @@ export default function App() {
       await updateDoc(doc(db, "orders", id), { status });
       loadOrders();
     } catch (error) {
-      console.error(error);
+      console.error("Error updating status:", error);
     }
   };
 
-  // ✅ DELETE
+  // ✅ DELETE ORDER
   const deleteOrder = async (id) => {
     try {
       await deleteDoc(doc(db, "orders", id));
       loadOrders();
     } catch (error) {
-      console.error(error);
-    }
-  };
-
-  // ✅ HANDLE FILE/LINK
-  const handleFileUpload = async ({ fileURL, modelLink }) => {
-    try {
-      const snapshot = await getDocs(collection(db, "orders"));
-      const lastOrder = snapshot.docs[snapshot.docs.length - 1];
-
-      if (lastOrder) {
-        await updateDoc(doc(db, "orders", lastOrder.id), {
-          fileURL: fileURL || null,
-          modelLink: modelLink || null,
-          status: "Quote Required",
-        });
-      }
-
-      loadOrders();
-      setCart([]);
-      setView("orders");
-    } catch (error) {
-      console.error(error);
+      console.error("Error deleting order:", error);
     }
   };
 
@@ -132,6 +141,7 @@ export default function App() {
       />
 
       <div style={{ padding: "30px" }}>
+        {/* ✅ PRODUCTS */}
         {view === "products" && (
           <Products
             cart={cart}
@@ -141,31 +151,34 @@ export default function App() {
           />
         )}
 
+        {/* ✅ CART */}
         {view === "cart" && (
           <Cart
             cart={cart}
             total={total}
             removeItem={(i) =>
-              setCart(cart.filter((_, idx) => idx !== i))
+              setCart(cart.filter((_, index) => index !== i))
             }
             startCheckout={startCheckout}
           />
         )}
 
+        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
           <Checkout
             total={total}
-            orderRef={orderRef}
+            orderRef={orderId}
             onFileUpload={handleFileUpload}
           />
         )}
 
+        {/* ✅ ORDERS */}
         {view === "orders" && (
           <Orders
             orders={orders}
             updateStatus={updateStatus}
             deleteOrder={deleteOrder}
-            setPrice={setPrice} // ✅ NEW
+            setPrice={setPrice}
           />
         )}
       </div>
