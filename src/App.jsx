@@ -10,7 +10,6 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-// ✅ COMPONENTS
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -21,17 +20,9 @@ export default function App() {
   const [search, setSearch] = useState("");
   const [cart, setCart] = useState([]);
   const [view, setView] = useState("products");
-
-  // ✅ Store Firestore document ID
+  const [orders, setOrders] = useState([]);
   const [currentOrderId, setCurrentOrderId] = useState(null);
 
-  const [orders, setOrders] = useState([]);
-
-  // ✅ Generate nice-looking order ref
-  const generateOrderRef = () =>
-    "ENV-" + Math.floor(10000 + Math.random() * 90000);
-
-  // ✅ Calculate total
   const total = cart.reduce(
     (sum, item) =>
       typeof item.price === "number" ? sum + item.price : sum,
@@ -40,20 +31,12 @@ export default function App() {
 
   // ✅ LOAD ORDERS
   const loadOrders = async () => {
-    try {
-      const snapshot = await getDocs(collection(db, "orders"));
-
-      console.log("Orders loaded:", snapshot.docs.length);
-
-      const list = snapshot.docs.map((docSnap) => ({
-        id: docSnap.id,
-        ...docSnap.data(),
-      }));
-
-      setOrders(list);
-    } catch (error) {
-      console.error("Error loading orders:", error);
-    }
+    const snapshot = await getDocs(collection(db, "orders"));
+    const list = snapshot.docs.map((docSnap) => ({
+      id: docSnap.id,
+      ...docSnap.data(),
+    }));
+    setOrders(list);
   };
 
   useEffect(() => {
@@ -62,92 +45,59 @@ export default function App() {
 
   // ✅ CREATE ORDER
   const startCheckout = async () => {
-    const ref = generateOrderRef();
-
     console.log("Creating order...");
 
-    try {
-      const docRef = await addDoc(collection(db, "orders"), {
-        ref,
-        items: cart,
-        total,
-        // ✅ FIXED LOGIC
-        status: total === 0 ? "Quote Required" : "Pending Payment",
-        date: new Date().toISOString(),
-      });
+    const docRef = await addDoc(collection(db, "orders"), {
+      items: cart,
+      total,
+      status: total === 0 ? "Quote Required" : "Pending Payment",
+      date: new Date().toISOString(),
+    });
 
-      console.log("Order created:", docRef.id);
+    console.log("Order created:", docRef.id);
 
-      setCurrentOrderId(docRef.id);
-
-      setView("checkout");
-    } catch (error) {
-      console.error("Error creating order:", error);
-    }
+    setCurrentOrderId(docRef.id);
+    setView("checkout");
   };
 
-  // ✅ HANDLE FILE / LINK SUBMISSION
+  // ✅ HANDLE QUOTE SUBMISSION
   const handleFileUpload = async ({ fileURL, modelLink }) => {
     if (!currentOrderId) {
-      console.error("No order ID found!");
+      console.error("No order ID!");
       return;
     }
 
-    try {
-      console.log("Updating order:", currentOrderId);
+    await updateDoc(doc(db, "orders", currentOrderId), {
+      modelLink: modelLink || null,
+    });
 
-      await updateDoc(doc(db, "orders", currentOrderId), {
-        fileURL: fileURL || null,
-        modelLink: modelLink || null,
-        status: "Quote Required",
-      });
+    await loadOrders();
 
-      await loadOrders();
-
-      setCart([]); // ✅ clear cart
-      setView("orders"); // ✅ go to Orders screen
-    } catch (error) {
-      console.error("Error updating order:", error);
-    }
+    setCart([]);
+    setView("orders");
   };
 
-  // ✅ ADMIN: SET PRICE
-  const setPrice = async (id, price) => {
-    try {
-      await updateDoc(doc(db, "orders", id), {
-        total: price,
-        status: "Pending Payment",
-      });
-
-      loadOrders();
-    } catch (error) {
-      console.error("Error setting price:", error);
-    }
-  };
-
-  // ✅ UPDATE STATUS
+  // ✅ ADMIN ACTIONS
   const updateStatus = async (id, status) => {
-    try {
-      await updateDoc(doc(db, "orders", id), { status });
-      loadOrders();
-    } catch (error) {
-      console.error("Error updating status:", error);
-    }
+    await updateDoc(doc(db, "orders", id), { status });
+    loadOrders();
   };
 
-  // ✅ DELETE
   const deleteOrder = async (id) => {
-    try {
-      await deleteDoc(doc(db, "orders", id));
-      loadOrders();
-    } catch (error) {
-      console.error("Error deleting order:", error);
-    }
+    await deleteDoc(doc(db, "orders", id));
+    loadOrders();
+  };
+
+  const setPrice = async (id, price) => {
+    await updateDoc(doc(db, "orders", id), {
+      total: price,
+      status: "Pending Payment",
+    });
+    loadOrders();
   };
 
   return (
     <div>
-      {/* ✅ HEADER */}
       <Header
         search={search}
         setSearch={setSearch}
@@ -156,48 +106,38 @@ export default function App() {
         setView={setView}
       />
 
-      <div style={{ padding: "30px" }}>
-        {/* ✅ PRODUCTS */}
-        {view === "products" && (
-          <Products
-            cart={cart}
-            setCart={setCart}
-            search={search}
-            setView={setView}
-          />
-        )}
+      {view === "products" && (
+        <Products
+          cart={cart}
+          setCart={setCart}
+          search={search}
+          setView={setView}
+        />
+      )}
 
-        {/* ✅ CART */}
-        {view === "cart" && (
-          <Cart
-            cart={cart}
-            total={total}
-            removeItem={(i) =>
-              setCart(cart.filter((_, idx) => idx !== i))
-            }
-            startCheckout={startCheckout}
-          />
-        )}
+      {view === "cart" && (
+        <Cart
+          cart={cart}
+          total={total}
+          startCheckout={startCheckout}
+        />
+      )}
 
-        {/* ✅ CHECKOUT */}
-        {view === "checkout" && (
-          <Checkout
-            total={total}
-            orderRef={currentOrderId}
-            onFileUpload={handleFileUpload}
-          />
-        )}
+      {view === "checkout" && (
+        <Checkout
+          total={total}
+          onFileUpload={handleFileUpload}
+        />
+      )}
 
-        {/* ✅ ORDERS */}
-        {view === "orders" && (
-          <Orders
-            orders={orders}
-            updateStatus={updateStatus}
-            deleteOrder={deleteOrder}
-            setPrice={setPrice}
-          />
-        )}
-      </div>
+      {view === "orders" && (
+        <Orders
+          orders={orders}
+          updateStatus={updateStatus}
+          deleteOrder={deleteOrder}
+          setPrice={setPrice}
+        />
+      )}
     </div>
   );
 }
