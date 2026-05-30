@@ -77,7 +77,6 @@ export default function Orders({
             >
               <input type="hidden" name="merchant_id" value="10000100" />
               <input type="hidden" name="merchant_key" value="46f0cd694581a" />
-
               <input type="hidden" name="amount" value={o.total} />
               <input
                 type="hidden"
@@ -90,9 +89,7 @@ export default function Orders({
                 value={o.id}
               />
 
-              <button type="submit">
-                Pay Now
-              </button>
+              <button type="submit">Pay Now</button>
             </form>
           )}
 
