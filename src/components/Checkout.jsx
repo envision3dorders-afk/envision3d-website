@@ -13,7 +13,6 @@ export default function Checkout({ total, onFileUpload }) {
     }
 
     try {
-      // ✅ For now, no upload — just pass data
       await onFileUpload({
         fileURL: null,
         modelLink: link,
@@ -23,7 +22,6 @@ export default function Checkout({ total, onFileUpload }) {
 
     } catch (error) {
       console.error("Quote error:", error);
-      alert("Something went wrong");
     }
   };
 
@@ -33,7 +31,6 @@ export default function Checkout({ total, onFileUpload }) {
 
       <p>Total: R0</p>
 
-      {/* ✅ FILE INPUT */}
       <div style={{ marginBottom: "10px" }}>
         <input
           type="file"
@@ -41,7 +38,6 @@ export default function Checkout({ total, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ LINK INPUT */}
       <div style={{ marginBottom: "10px" }}>
         <input
           type="text"
@@ -51,7 +47,6 @@ export default function Checkout({ total, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ BUTTON */}
       <button onClick={handleQuote}>
         Request Quote
       </button>
