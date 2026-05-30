@@ -46,7 +46,7 @@ export default function Orders({
           )}
 
           {o.status === "Quote Required" && (
-            <div style={{ marginTop: "10px" }}>
+            <div>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -73,7 +73,6 @@ export default function Orders({
             <form
               action="https://sandbox.payfast.co.za/eng/process"
               method="post"
-              style={{ marginTop: "10px" }}
             >
               <input type="hidden" name="merchant_id" value="10000100" />
               <input type="hidden" name="merchant_key" value="46f0cd694581a" />
@@ -93,7 +92,7 @@ export default function Orders({
             </form>
           )}
 
-          <div style={{ marginTop: "10px" }}>
+          <div>
             <button onClick={() => updateStatus(o.id, "Paid")}>
               Paid
             </button>
