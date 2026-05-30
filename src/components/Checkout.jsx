@@ -11,19 +11,17 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const merchant_id = "10000100";
   const merchant_key = "46f0cd694581a";
 
-  // ✅ Replace with your actual deployed URL
   const return_url =
     "https://envision3d-website-jivechjaa-orders-6322s-projects.vercel.app";
   const cancel_url = return_url;
   const notify_url = return_url;
 
-  // ✅ Upload file to Firebase Storage
+  // ✅ Upload file
   const uploadFile = async () => {
     if (!file) return null;
 
     try {
       setLoading(true);
-
       const storageRef = ref(
         storage,
         `models/${Date.now()}_${file.name}`
@@ -35,13 +33,13 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       setLoading(false);
       return url;
     } catch (error) {
-      console.error("Upload failed:", error);
+      console.error("Upload error:", error);
       setLoading(false);
       return null;
     }
   };
 
-  // ✅ Handle quote submission
+  // ✅ Quote submission
   const handleQuote = async () => {
     const fileURL = await uploadFile();
 
@@ -55,7 +53,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       modelLink: link || null,
     });
 
-    alert("✅ Quote request sent!");
+    alert("✅ Quote request submitted!");
   };
 
   return (
@@ -65,7 +63,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       <p>Total: R{total}</p>
       <p>Reference: {orderRef}</p>
 
-      {/* ✅ FILE UPLOAD */}
+      {/* FILE UPLOAD */}
       <div style={{ marginBottom: "15px" }}>
         <label>Upload STL/File (optional)</label>
         <br />
@@ -75,7 +73,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ LINK INPUT */}
+      {/* LINK */}
       <div style={{ marginBottom: "15px" }}>
         <label>OR paste model link</label>
         <br />
@@ -92,9 +90,8 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ PAYMENT OR QUOTE FLOW */}
+      {/* ✅ PAYMENT OR QUOTE */}
       {total > 0 ? (
-        // ✅ PAYFAST FORM (FIXED — THIS REMOVES RED ❌)
         <form
           action="https://sandbox.payfast.co.za/eng/process"
           method="post"
@@ -107,16 +104,8 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
           <input type="hidden" name="notify_url" value={notify_url} />
 
           <input type="hidden" name="amount" value={total} />
-          <input
-            type="hidden"
-            name="item_name"
-            value="Envision3D Order"
-          />
-          <input
-            type="hidden"
-            name="m_payment_id"
-            value={orderRef}
-          />
+          <input type="hidden" name="item_name" value="Envision3D Order" />
+          <input type="hidden" name="m_payment_id" value={orderRef} />
 
           <div style={{ marginBottom: "10px" }}>
             <input
@@ -147,14 +136,12 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
           </button>
         </form>
       ) : (
-        // ✅ QUOTE FLOW
         <button
           onClick={handleQuote}
           disabled={loading}
           style={{
             padding: "12px",
             background: "#f59e0b",
-            color: "#000",
             border: "none",
             borderRadius: "6px",
             cursor: "pointer",
