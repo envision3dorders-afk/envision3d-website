@@ -7,7 +7,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const [link, setLink] = useState("");
   const [loading, setLoading] = useState(false);
 
-  // ✅ PayFast sandbox credentials
   const merchant_id = "10000100";
   const merchant_key = "46f0cd694581a";
 
@@ -16,7 +15,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const cancel_url = return_url;
   const notify_url = return_url;
 
-  // ✅ Upload file
+  // Upload file
   const uploadFile = async () => {
     if (!file) return null;
 
@@ -26,20 +25,18 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         storage,
         `models/${Date.now()}_${file.name}`
       );
-
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
-
       setLoading(false);
       return url;
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error(error);
       setLoading(false);
       return null;
     }
   };
 
-  // ✅ Quote submission
+  // Quote flow
   const handleQuote = async () => {
     const fileURL = await uploadFile();
 
@@ -53,7 +50,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       modelLink: link || null,
     });
 
-    alert("✅ Quote request submitted!");
+    alert("Quote request submitted ✅");
   };
 
   return (
@@ -63,9 +60,9 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       <p>Total: R{total}</p>
       <p>Reference: {orderRef}</p>
 
-      {/* FILE UPLOAD */}
+      {/* FILE */}
       <div style={{ marginBottom: "15px" }}>
-        <label>Upload STL/File (optional)</label>
+        <label>Upload File</label>
         <br />
         <input
           type="file"
@@ -75,18 +72,12 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
 
       {/* LINK */}
       <div style={{ marginBottom: "15px" }}>
-        <label>OR paste model link</label>
+        <label>OR paste link</label>
         <br />
         <input
           type="text"
-          placeholder="https://example.com/model"
           value={link}
           onChange={(e) => setLink(e.target.value)}
-          style={{
-            padding: "10px",
-            width: "100%",
-            maxWidth: "300px",
-          }}
         />
       </div>
 
@@ -105,48 +96,25 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
 
           <input type="hidden" name="amount" value={total} />
           <input type="hidden" name="item_name" value="Envision3D Order" />
-          <input type="hidden" name="m_payment_id" value={orderRef} />
+          <input
+            type="hidden"
+            name="m_payment_id"
+            value={orderRef}
+          />
 
-          <div style={{ marginBottom: "10px" }}>
-            <input
-              type="email"
-              name="email_address"
-              placeholder="Enter your email"
-              required
-              style={{
-                padding: "10px",
-                width: "100%",
-                maxWidth: "300px",
-              }}
-            />
-          </div>
+          <input
+            type="email"
+            name="email_address"
+            placeholder="Email"
+            required
+          />
 
-          <button
-            type="submit"
-            style={{
-              padding: "12px",
-              background: "#16a34a",
-              color: "#fff",
-              border: "none",
-              borderRadius: "6px",
-              cursor: "pointer",
-            }}
-          >
-            Pay Now
-          </button>
+          <br />
+
+          <button type="submit">Pay Now</button>
         </form>
       ) : (
-        <button
-          onClick={handleQuote}
-          disabled={loading}
-          style={{
-            padding: "12px",
-            background: "#f59e0b",
-            border: "none",
-            borderRadius: "6px",
-            cursor: "pointer",
-          }}
-        >
+        <button onClick={handleQuote} disabled={loading}>
           {loading ? "Uploading..." : "Request Quote"}
         </button>
       )}
