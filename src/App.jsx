@@ -10,7 +10,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
-// ✅ COMPONENT IMPORTS
+// ✅ COMPONENTS
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -24,16 +24,16 @@ export default function App() {
   const [orderRef, setOrderRef] = useState("");
   const [orders, setOrders] = useState([]);
 
-  // ✅ GENERATE ORDER REF
+  // ✅ Generate order reference
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  // ✅ CALCULATE TOTAL
+  // ✅ Calculate total
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ LOAD ORDERS FROM FIREBASE
+  // ✅ Load orders
   const loadOrders = async () => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
@@ -52,7 +52,7 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ UPDATE ORDER STATUS
+  // ✅ Update order status
   const updateStatus = async (id, status) => {
     try {
       await updateDoc(doc(db, "orders", id), { status });
@@ -62,7 +62,7 @@ export default function App() {
     }
   };
 
-  // ✅ DELETE ORDER
+  // ✅ Delete order
   const deleteOrder = async (id) => {
     try {
       await deleteDoc(doc(db, "orders", id));
@@ -72,7 +72,7 @@ export default function App() {
     }
   };
 
-  // ✅ START CHECKOUT (SAVE ORDER BEFORE PAYMENT)
+  // ✅ Start checkout (save order BEFORE payment)
   const startCheckout = async () => {
     const ref = generateOrderRef();
     setOrderRef(ref);
@@ -82,13 +82,33 @@ export default function App() {
         ref: ref,
         items: cart,
         total: total,
-        status: "Pending Payment",
+        status: total > 0 ? "Pending Payment" : "Quote Required",
         date: new Date().toISOString(),
       });
 
       setView("checkout");
     } catch (error) {
       console.error("Error creating order:", error);
+    }
+  };
+
+  // ✅ Handle quote submission (for custom products)
+  const handleFileUpload = async ({ file, modelLink }) => {
+    try {
+      const snapshot = await getDocs(collection(db, "orders"));
+      const lastOrder = snapshot.docs[snapshot.docs.length - 1];
+
+      if (lastOrder) {
+        await updateDoc(doc(db, "orders", lastOrder.id), {
+          modelLink: modelLink || null,
+          status: "Quote Required",
+        });
+      }
+
+      await loadOrders();
+      setView("orders");
+    } catch (error) {
+      console.error("Error updating order:", error);
     }
   };
 
@@ -106,7 +126,12 @@ export default function App() {
       <div style={{ padding: "30px" }}>
         {/* ✅ PRODUCTS */}
         {view === "products" && (
-          <Products cart={cart} setCart={setCart} search={search} />
+          <Products
+            cart={cart}
+            setCart={setCart}
+            search={search}
+            setView={setView}
+          />
         )}
 
         {/* ✅ CART */}
@@ -117,13 +142,17 @@ export default function App() {
             removeItem={(i) =>
               setCart(cart.filter((_, index) => index !== i))
             }
-            startCheckout={startCheckout} // ✅ UPDATED
+            startCheckout={startCheckout}
           />
         )}
 
-        {/* ✅ CHECKOUT (PAYFAST) */}
+        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
-          <Checkout total={total} orderRef={orderRef} />
+          <Checkout
+            total={total}
+            orderRef={orderRef}
+            onFileUpload={handleFileUpload}
+          />
         )}
 
         {/* ✅ ORDERS */}
