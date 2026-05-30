@@ -24,16 +24,13 @@ export default function App() {
   const [orderRef, setOrderRef] = useState("");
   const [orders, setOrders] = useState([]);
 
-  // ✅ Generate order reference
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
-  // ✅ Calculate total
   const total = cart.reduce((sum, item) => {
     return typeof item.price === "number" ? sum + item.price : sum;
   }, 0);
 
-  // ✅ Load orders
   const loadOrders = async () => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
@@ -44,7 +41,7 @@ export default function App() {
 
       setOrders(list);
     } catch (error) {
-      console.error("Error loading orders:", error);
+      console.error(error);
     }
   };
 
@@ -52,47 +49,57 @@ export default function App() {
     loadOrders();
   }, []);
 
-  // ✅ Update order status
+  // ✅ START CHECKOUT
+  const startCheckout = async () => {
+    const ref = generateOrderRef();
+    setOrderRef(ref);
+
+    await addDoc(collection(db, "orders"), {
+      ref,
+      items: cart,
+      total,
+      status: total > 0 ? "Pending Payment" : "Quote Required",
+      date: new Date().toISOString(),
+    });
+
+    setView("checkout");
+  };
+
+  // ✅ SET PRICE (NEW FUNCTION)
+  const setPrice = async (id, price) => {
+    try {
+      await updateDoc(doc(db, "orders", id), {
+        total: price,
+        status: "Pending Payment",
+      });
+
+      loadOrders();
+    } catch (error) {
+      console.error(error);
+    }
+  };
+
+  // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
     try {
       await updateDoc(doc(db, "orders", id), { status });
       loadOrders();
     } catch (error) {
-      console.error("Error updating status:", error);
+      console.error(error);
     }
   };
 
-  // ✅ Delete order
+  // ✅ DELETE
   const deleteOrder = async (id) => {
     try {
       await deleteDoc(doc(db, "orders", id));
       loadOrders();
     } catch (error) {
-      console.error("Error deleting order:", error);
+      console.error(error);
     }
   };
 
-  // ✅ Start checkout (create order first)
-  const startCheckout = async () => {
-    const ref = generateOrderRef();
-    setOrderRef(ref);
-
-    try {
-      await addDoc(collection(db, "orders"), {
-        ref: ref,
-        items: cart,
-        total: total,
-        status: total > 0 ? "Pending Payment" : "Quote Required",
-        date: new Date().toISOString(),
-      });
-
-      setView("checkout");
-    } catch (error) {
-      console.error("Error creating order:", error);
-    }
-  };
-
-  // ✅ Handle file + link from Checkout
+  // ✅ HANDLE FILE/LINK
   const handleFileUpload = async ({ fileURL, modelLink }) => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
@@ -106,17 +113,16 @@ export default function App() {
         });
       }
 
-      await loadOrders();
-      setCart([]); // ✅ clear cart after submission
-      setView("orders"); // ✅ go to orders page
+      loadOrders();
+      setCart([]);
+      setView("orders");
     } catch (error) {
-      console.error("Error updating order:", error);
+      console.error(error);
     }
   };
 
   return (
     <div>
-      {/* ✅ HEADER */}
       <Header
         search={search}
         setSearch={setSearch}
@@ -126,7 +132,6 @@ export default function App() {
       />
 
       <div style={{ padding: "30px" }}>
-        {/* ✅ PRODUCTS */}
         {view === "products" && (
           <Products
             cart={cart}
@@ -136,7 +141,6 @@ export default function App() {
           />
         )}
 
-        {/* ✅ CART */}
         {view === "cart" && (
           <Cart
             cart={cart}
@@ -148,7 +152,6 @@ export default function App() {
           />
         )}
 
-        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
           <Checkout
             total={total}
@@ -157,12 +160,12 @@ export default function App() {
           />
         )}
 
-        {/* ✅ ORDERS */}
         {view === "orders" && (
           <Orders
             orders={orders}
             updateStatus={updateStatus}
             deleteOrder={deleteOrder}
+            setPrice={setPrice} // ✅ NEW
           />
         )}
       </div>
