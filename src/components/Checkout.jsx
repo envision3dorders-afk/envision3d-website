@@ -19,35 +19,38 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const uploadFile = async () => {
     if (!file) return null;
 
+    setLoading(true);
+
     try {
-      setLoading(true);
       const storageRef = ref(
         storage,
         `models/${Date.now()}_${file.name}`
       );
+
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
+
       setLoading(false);
       return url;
-    } catch (error) {
-      console.error(error);
+    } catch (err) {
+      console.error(err);
       setLoading(false);
       return null;
     }
   };
 
-  // Quote flow
+  // Quote logic
   const handleQuote = async () => {
     const fileURL = await uploadFile();
 
     if (!fileURL && !link) {
-      alert("Please upload a file or provide a link.");
+      alert("Upload a file or provide a link");
       return;
     }
 
     await onFileUpload({
-      fileURL: fileURL || null,
-      modelLink: link || null,
+      fileURL,
+      modelLink: link,
     });
 
     alert("Quote request submitted ✅");
@@ -61,9 +64,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       <p>Reference: {orderRef}</p>
 
       {/* FILE */}
-      <div style={{ marginBottom: "15px" }}>
-        <label>Upload File</label>
-        <br />
+      <div>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
@@ -71,17 +72,16 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       </div>
 
       {/* LINK */}
-      <div style={{ marginBottom: "15px" }}>
-        <label>OR paste link</label>
-        <br />
+      <div>
         <input
           type="text"
+          placeholder="Paste model link"
           value={link}
           onChange={(e) => setLink(e.target.value)}
         />
       </div>
 
-      {/* ✅ PAYMENT OR QUOTE */}
+      {/* ✅ KEY FIX HERE */}
       {total > 0 ? (
         <form
           action="https://sandbox.payfast.co.za/eng/process"
@@ -95,12 +95,8 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
           <input type="hidden" name="notify_url" value={notify_url} />
 
           <input type="hidden" name="amount" value={total} />
-          <input type="hidden" name="item_name" value="Envision3D Order" />
-          <input
-            type="hidden"
-            name="m_payment_id"
-            value={orderRef}
-          />
+          <input type="hidden" name="item_name" value="Order" />
+          <input type="hidden" name="m_payment_id" value={orderRef} />
 
           <input
             type="email"
@@ -108,8 +104,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
             placeholder="Email"
             required
           />
-
-          <br />
 
           <button type="submit">Pay Now</button>
         </form>
