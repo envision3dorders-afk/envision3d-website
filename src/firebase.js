@@ -2,13 +2,13 @@ import { initializeApp } from "firebase/app";
 import { getFirestore } from "firebase/firestore";
 import { getStorage } from "firebase/storage";
 
-// ✅ Your Firebase config (FIXED storage bucket)
+// ✅ Firebase configuration
 const firebaseConfig = {
   apiKey: "AIzaSyCwFA-qkuGpXddzL5CY5ItNJR_XZ25ho1w",
   authDomain: "envision3d-orders.firebaseapp.com",
   projectId: "envision3d-orders",
 
-  // ✅ IMPORTANT FIX (must end with appspot.com)
+  // ✅ CRITICAL FIX — correct storage bucket
   storageBucket: "envision3d-orders.appspot.com",
 
   messagingSenderId: "434059997461",
@@ -18,7 +18,7 @@ const firebaseConfig = {
 // ✅ Initialize Firebase
 const app = initializeApp(firebaseConfig);
 
-// ✅ Firestore database
+// ✅ Firestore (database)
 export const db = getFirestore(app);
 
 // ✅ Firebase Storage (for file uploads)
