@@ -26,21 +26,17 @@ export default function Orders({
             color: "#e5e7eb",
           }}
         >
-          {/* ✅ ORDER HEADER */}
           <h3>{o.ref || o.id}</h3>
 
-          {/* ✅ STATUS */}
           <p>
             <strong>Status:</strong> {o.status}
           </p>
 
-          {/* ✅ TOTAL */}
           <p>
             <strong>Total:</strong>{" "}
             {o.total > 0 ? `R${o.total}` : "Quote Required"}
           </p>
 
-          {/* ✅ MODEL LINK */}
           {o.modelLink && (
             <p>
               <a href={o.modelLink} target="_blank" rel="noreferrer">
@@ -49,7 +45,6 @@ export default function Orders({
             </p>
           )}
 
-          {/* ✅ SET PRICE */}
           {o.status === "Quote Required" && (
             <div style={{ marginTop: "10px" }}>
               <input
@@ -68,14 +63,12 @@ export default function Orders({
                 onClick={() =>
                   setPrice(o.id, Number(priceInputs[o.id]))
                 }
-                style={{ marginLeft: "5px" }}
               >
                 Set Price
               </button>
             </div>
           )}
 
-          {/* ✅ PAY BUTTON */}
           {o.status === "Pending Payment" && (
             <form
               action="https://sandbox.payfast.co.za/eng/process"
@@ -97,23 +90,12 @@ export default function Orders({
                 value={o.id}
               />
 
-              <button
-                type="submit"
-                style={{
-                  padding: "8px 12px",
-                  background: "#16a34a",
-                  color: "#fff",
-                  border: "none",
-                  borderRadius: "6px",
-                  cursor: "pointer",
-                }}
-              >
+              <button type="submit">
                 Pay Now
               </button>
             </form>
           )}
 
-          {/* ✅ ACTIONS */}
           <div style={{ marginTop: "10px" }}>
             <button onClick={() => updateStatus(o.id, "Paid")}>
               Paid
