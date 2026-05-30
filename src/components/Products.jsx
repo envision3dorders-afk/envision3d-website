@@ -14,16 +14,8 @@ export default function Products({ cart, setCart, search, setView }) {
       image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand",
     },
-    {
-      id: 3,
-      name: "Miniature Figurine",
-      price: 85,
-      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
-      description: "Mini collectible",
-    },
   ];
 
-  // ✅ Filter products
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -33,84 +25,23 @@ export default function Products({ cart, setCart, search, setView }) {
       <h2>Products</h2>
 
       {filteredProducts.map((p) => (
-        <div
-          key={p.id}
-          style={{
-            background: "#1c1f26",
-            padding: "20px",
-            marginBottom: "15px",
-            borderRadius: "12px",
-            border: "1px solid #2a2e37",
-            color: "#e5e7eb",
-          }}
-        >
-          {/* ✅ IMAGE */}
-          {p.image ? (
-            <img
-              src={p.image}
-              alt={p.name}
-              style={{
-                width: "100%",
-                maxWidth: "200px",
-                borderRadius: "8px",
-                marginBottom: "10px",
-              }}
-            />
-          ) : (
-            <div
-              style={{
-                height: "140px",
-                background: "#333",
-                borderRadius: "8px",
-                marginBottom: "10px",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-              }}
-            >
-              Custom Upload
-            </div>
-          )}
-
+        <div key={p.id}>
           <h3>{p.name}</h3>
           <p>{p.description}</p>
 
           <p>
-            <strong>
-              {typeof p.price === "number" ? `R${p.price}` : p.price}
-            </strong>
+            {typeof p.price === "number" ? `R${p.price}` : p.price}
           </p>
 
-          {/* ✅ BUTTON LOGIC */}
           {typeof p.price === "number" ? (
-            // ✅ Normal products → add to cart
-            <button
-              onClick={() => setCart([...cart, p])}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "6px",
-                background: "#3b82f6",
-                color: "#fff",
-                border: "none",
-                cursor: "pointer",
-              }}
-            >
+            <button onClick={() => setCart([...cart, p])}>
               Add to Cart
             </button>
           ) : (
-            // ✅ Custom product → go straight to checkout (quote flow)
             <button
               onClick={() => {
-                setCart([p]); // only custom item in cart
-                setView("checkout"); // go directly to checkout
-              }}
-              style={{
-                padding: "8px 12px",
-                borderRadius: "6px",
-                background: "#f59e0b",
-                color: "#000",
-                border: "none",
-                cursor: "pointer",
+                setCart([p]);     // ✅ put item in cart
+                setView("cart");  // ✅ go to cart FIRST
               }}
             >
               Request Quote
@@ -121,4 +52,3 @@ export default function Products({ cart, setCart, search, setView }) {
     </>
   );
 }
-``
