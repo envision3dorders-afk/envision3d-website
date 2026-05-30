@@ -10,6 +10,7 @@ import {
   deleteDoc,
 } from "firebase/firestore";
 
+// ✅ COMPONENTS
 import Header from "./components/Header";
 import Products from "./components/Products";
 import Cart from "./components/Cart";
@@ -24,10 +25,11 @@ export default function App() {
   const [currentOrderId, setCurrentOrderId] = useState(null);
   const [orders, setOrders] = useState([]);
 
-  // ✅ Generate readable order reference
+  // ✅ Generate order ref
   const generateOrderRef = () =>
     "ENV-" + Math.floor(10000 + Math.random() * 90000);
 
+  // ✅ Calculate total
   const total = cart.reduce(
     (sum, item) =>
       typeof item.price === "number" ? sum + item.price : sum,
@@ -36,73 +38,107 @@ export default function App() {
 
   // ✅ LOAD ORDERS
   const loadOrders = async () => {
-    const snapshot = await getDocs(collection(db, "orders"));
-    const list = snapshot.docs.map((d) => ({
-      id: d.id,
-      ...d.data(),
-    }));
-    setOrders(list);
+    try {
+      const snapshot = await getDocs(collection(db, "orders"));
+
+      console.log("Orders loaded:", snapshot.docs.length); // ✅ DEBUG
+
+      const list = snapshot.docs.map((docSnap) => ({
+        id: docSnap.id,
+        ...docSnap.data(),
+      }));
+
+      setOrders(list);
+    } catch (error) {
+      console.error("Error loading orders:", error);
+    }
   };
 
   useEffect(() => {
     loadOrders();
   }, []);
 
-  // ✅ CREATE ORDER
+  // ✅ CREATE ORDER (FIXED)
   const startCheckout = async () => {
     const ref = generateOrderRef();
 
-    const docRef = await addDoc(collection(db, "orders"), {
-      ref,
-      items: cart,
-      total,
-      status: total > 0 ? "Pending Payment" : "Quote Required",
-      date: new Date().toISOString(),
-    });
+    console.log("Creating order..."); // ✅ DEBUG
 
-    // ✅ Save correct Firestore ID
-    setCurrentOrderId(docRef.id);
+    try {
+      const docRef = await addDoc(collection(db, "orders"), {
+        ref,
+        items: cart,
+        total,
+        status: total > 0 ? "Pending Payment" : "Quote Required",
+        date: new Date().toISOString(),
+      });
 
-    setView("checkout");
+      console.log("Order created with ID:", docRef.id); // ✅ DEBUG
+
+      setCurrentOrderId(docRef.id);
+
+      setView("checkout");
+    } catch (error) {
+      console.error("Error creating order:", error);
+    }
   };
 
-  // ✅ FILE / LINK SAVE (FIXED)
+  // ✅ HANDLE FILE / LINK
   const handleFileUpload = async ({ fileURL, modelLink }) => {
     if (!currentOrderId) {
-      console.error("No order ID found");
+      console.error("No order ID found!");
       return;
     }
 
-    await updateDoc(doc(db, "orders", currentOrderId), {
-      fileURL: fileURL || null,
-      modelLink: modelLink || null,
-    });
+    try {
+      console.log("Updating order:", currentOrderId); // ✅ DEBUG
 
-    await loadOrders();
+      await updateDoc(doc(db, "orders", currentOrderId), {
+        fileURL: fileURL || null,
+        modelLink: modelLink || null,
+      });
 
-    setCart([]);
-    setView("orders");
+      await loadOrders();
+
+      setCart([]);
+      setView("orders");
+    } catch (error) {
+      console.error("Error updating order:", error);
+    }
   };
 
   // ✅ SET PRICE
   const setPrice = async (id, price) => {
-    await updateDoc(doc(db, "orders", id), {
-      total: price,
-      status: "Pending Payment",
-    });
-    loadOrders();
+    try {
+      await updateDoc(doc(db, "orders", id), {
+        total: price,
+        status: "Pending Payment",
+      });
+
+      loadOrders();
+    } catch (error) {
+      console.error("Error setting price:", error);
+    }
   };
 
-  // ✅ STATUS UPDATE
+  // ✅ UPDATE STATUS
   const updateStatus = async (id, status) => {
-    await updateDoc(doc(db, "orders", id), { status });
-    loadOrders();
+    try {
+      await updateDoc(doc(db, "orders", id), { status });
+      loadOrders();
+    } catch (error) {
+      console.error("Error updating status:", error);
+    }
   };
 
   // ✅ DELETE
   const deleteOrder = async (id) => {
-    await deleteDoc(doc(db, "orders", id));
-    loadOrders();
+    try {
+      await deleteDoc(doc(db, "orders", id));
+      loadOrders();
+    } catch (error) {
+      console.error("Error deleting order:", error);
+    }
   };
 
   return (
@@ -116,6 +152,7 @@ export default function App() {
       />
 
       <div style={{ padding: "30px" }}>
+        {/* ✅ PRODUCTS */}
         {view === "products" && (
           <Products
             cart={cart}
@@ -125,6 +162,7 @@ export default function App() {
           />
         )}
 
+        {/* ✅ CART */}
         {view === "cart" && (
           <Cart
             cart={cart}
@@ -132,10 +170,11 @@ export default function App() {
             removeItem={(i) =>
               setCart(cart.filter((_, idx) => idx !== i))
             }
-            startCheckout={startCheckout}
+            startCheckout={startCheckout} // ✅ IMPORTANT
           />
         )}
 
+        {/* ✅ CHECKOUT */}
         {view === "checkout" && (
           <Checkout
             total={total}
@@ -144,6 +183,7 @@ export default function App() {
           />
         )}
 
+        {/* ✅ ORDERS */}
         {view === "orders" && (
           <Orders
             orders={orders}
@@ -156,3 +196,4 @@ export default function App() {
     </div>
   );
 }
+``
