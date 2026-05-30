@@ -26,12 +26,15 @@ export default function Orders({
             color: "#e5e7eb",
           }}
         >
+          {/* ✅ ORDER HEADER */}
           <h3>{o.ref || o.id}</h3>
 
+          {/* ✅ STATUS */}
           <p>
             <strong>Status:</strong> {o.status}
           </p>
 
+          {/* ✅ TOTAL */}
           <p>
             <strong>Total:</strong>{" "}
             {o.total > 0 ? `R${o.total}` : "Quote Required"}
@@ -46,9 +49,9 @@ export default function Orders({
             </p>
           )}
 
-          {/* ✅ SET PRICE */}
+          {/* ✅ SET PRICE (ONLY WHEN QUOTE) */}
           {o.status === "Quote Required" && (
-            <div>
+            <div style={{ marginTop: "10px" }}>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -65,46 +68,52 @@ export default function Orders({
                 onClick={() =>
                   setPrice(o.id, Number(priceInputs[o.id]))
                 }
+                style={{ marginLeft: "5px" }}
               >
                 Set Price
               </button>
             </div>
           )}
 
-          {/* ✅ PAYFAST BUTTON */}
+          {/* ✅ PAYFAST BUTTON (ONLY WHEN READY) */}
           {o.status === "Pending Payment" && (
             <form
               action="https://sandbox.payfast.co.za/eng/process"
               method="post"
+              style={{ marginTop: "10px" }}
             >
               <input type="hidden" name="merchant_id" value="10000100" />
               <input type="hidden" name="merchant_key" value="46f0cd694581a" />
 
-              <input
-                type="hidden"
-                name="amount"
-                value={o.total}
-              />
-
+              <input type="hidden" name="amount" value={o.total} />
               <input
                 type="hidden"
                 name="item_name"
-                value="Envision3D Order"
+                value="Envision3D Custom Order"
               />
-
               <input
                 type="hidden"
                 name="m_payment_id"
                 value={o.id}
               />
 
-              <button type="submit">
+              <button
+                type="submit"
+                style={{
+                  padding: "8px 12px",
+                  backgroundColor: "#16a34a",
+                  color: "#fff",
+                  border: "none",
+                  borderRadius: "6px",
+                  cursor: "pointer",
+                }}
+              >
                 Pay Now
               </button>
             </form>
           )}
 
-          {/* ✅ ACTIONS */}
+          {/* ✅ ACTION BUTTONS */}
           <div style={{ marginTop: "10px" }}>
             <button onClick={() => updateStatus(o.id, "Paid")}>
               Paid
