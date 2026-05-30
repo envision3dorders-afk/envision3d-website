@@ -81,7 +81,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ KEY FIX HERE */}
+      {/* PAYMENT OR QUOTE */}
       {total > 0 ? (
         <form
           action="https://sandbox.payfast.co.za/eng/process"
