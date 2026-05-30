@@ -49,7 +49,7 @@ export default function Orders({
             </p>
           )}
 
-          {/* ✅ SET PRICE (ONLY WHEN QUOTE) */}
+          {/* ✅ SET PRICE */}
           {o.status === "Quote Required" && (
             <div style={{ marginTop: "10px" }}>
               <input
@@ -75,7 +75,7 @@ export default function Orders({
             </div>
           )}
 
-          {/* ✅ PAYFAST BUTTON (ONLY WHEN READY) */}
+          {/* ✅ PAY BUTTON */}
           {o.status === "Pending Payment" && (
             <form
               action="https://sandbox.payfast.co.za/eng/process"
@@ -101,7 +101,7 @@ export default function Orders({
                 type="submit"
                 style={{
                   padding: "8px 12px",
-                  backgroundColor: "#16a34a",
+                  background: "#16a34a",
                   color: "#fff",
                   border: "none",
                   borderRadius: "6px",
@@ -113,7 +113,7 @@ export default function Orders({
             </form>
           )}
 
-          {/* ✅ ACTION BUTTONS */}
+          {/* ✅ ACTIONS */}
           <div style={{ marginTop: "10px" }}>
             <button onClick={() => updateStatus(o.id, "Paid")}>
               Paid
