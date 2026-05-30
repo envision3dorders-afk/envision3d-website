@@ -14,14 +14,14 @@ export default function Checkout({ total, onFileUpload }) {
 
     try {
       await onFileUpload({
-        fileURL: null,
+        fileURL: null, // file upload comes later
         modelLink: link,
       });
 
       alert("Quote submitted ✅");
-
     } catch (error) {
       console.error("Quote error:", error);
+      alert("Something went wrong");
     }
   };
 
@@ -29,7 +29,7 @@ export default function Checkout({ total, onFileUpload }) {
     <div>
       <h2>Checkout</h2>
 
-      <p>Total: R0</p>
+      <p>Total: R{total}</p>
 
       <div style={{ marginBottom: "10px" }}>
         <input
@@ -47,9 +47,14 @@ export default function Checkout({ total, onFileUpload }) {
         />
       </div>
 
-      <button onClick={handleQuote}>
-        Request Quote
-      </button>
+      {total === 0 ? (
+        <button onClick={handleQuote}>
+          Request Quote
+        </button>
+      ) : (
+        <p>Payment flow here</p>
+      )}
     </div>
   );
 }
+``
