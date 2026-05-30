@@ -1,5 +1,4 @@
 export default function Products({ cart, setCart, search, setView }) {
-  // ✅ PRODUCTS DATA
   const products = [
     {
       id: 1,
@@ -12,21 +11,19 @@ export default function Products({ cart, setCart, search, setView }) {
       id: 2,
       name: "Phone Stand",
       price: 120,
-      image:
-        "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Phone+Stand",
       description: "Compact stand",
     },
     {
       id: 3,
       name: "Miniature Figurine",
       price: 85,
-      image:
-        "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
+      image: "https://dummyimage.com/300x200/cccccc/000000&text=Miniature",
       description: "Mini collectible",
     },
   ];
 
-  // ✅ FILTER
+  // ✅ Filter products
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -47,7 +44,7 @@ export default function Products({ cart, setCart, search, setView }) {
             color: "#e5e7eb",
           }}
         >
-          {/* IMAGE */}
+          {/* ✅ IMAGE */}
           {p.image ? (
             <img
               src={p.image}
@@ -84,9 +81,9 @@ export default function Products({ cart, setCart, search, setView }) {
             </strong>
           </p>
 
-          {/* ✅ SMART BUTTON */}
+          {/* ✅ BUTTON LOGIC */}
           {typeof p.price === "number" ? (
-            // ✅ Normal products
+            // ✅ Normal products → add to cart
             <button
               onClick={() => setCart([...cart, p])}
               style={{
@@ -101,11 +98,11 @@ export default function Products({ cart, setCart, search, setView }) {
               Add to Cart
             </button>
           ) : (
-            // ✅ Custom product (quote)
+            // ✅ Custom product → go straight to checkout (quote flow)
             <button
               onClick={() => {
-                setCart([p]); // only custom item
-                setView("checkout"); // go straight to checkout
+                setCart([p]); // only custom item in cart
+                setView("checkout"); // go directly to checkout
               }}
               style={{
                 padding: "8px 12px",
@@ -124,3 +121,4 @@ export default function Products({ cart, setCart, search, setView }) {
     </>
   );
 }
+``
