@@ -1,20 +1,17 @@
-export default function Cart({ cart, removeItem, total, startCheckout }) {
+export default function Cart({ cart, total, startCheckout }) {
   return (
-    <>
+    <div>
       <h2>Cart</h2>
 
       {cart.map((item, i) => (
-        <div key={i}>
-          {item.name} - {item.price}
-          <button onClick={() => removeItem(i)}>Remove</button>
-        </div>
+        <p key={i}>{item.name}</p>
       ))}
 
-      <h3>Total: R{total}</h3>
+      <p>Total: R{total}</p>
 
       <button onClick={startCheckout}>
         Checkout
       </button>
-    </>
+    </div>
   );
 }
