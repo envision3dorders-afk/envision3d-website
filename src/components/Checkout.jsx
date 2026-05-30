@@ -1,69 +1,48 @@
 import { useState } from "react";
-import { storage } from "../firebase";
-import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-export default function Checkout({ total, orderRef, onFileUpload }) {
+export default function Checkout({ total, onFileUpload }) {
   const [file, setFile] = useState(null);
   const [link, setLink] = useState("");
-  const [loading, setLoading] = useState(false);
-
-  // ✅ Upload to Firebase
-  const uploadFile = async () => {
-    if (!file) return null;
-
-    setLoading(true);
-
-    try {
-      const storageRef = ref(
-        storage,
-        `models/${Date.now()}_${file.name}`
-      );
-
-      await uploadBytes(storageRef, file);
-      const url = await getDownloadURL(storageRef);
-
-      setLoading(false);
-      return url;
-    } catch (error) {
-      console.error(error);
-      setLoading(false);
-      return null;
-    }
-  };
 
   const handleQuote = async () => {
-    console.log("Submitting quote..."); // ✅ DEBUG
+    console.log("✅ handleQuote triggered");
 
-    const fileURL = await uploadFile();
-
-    if (!fileURL && !link) {
-      alert("Add file or link");
+    if (!file && !link) {
+      alert("Please upload a file or enter a link");
       return;
     }
 
-    await onFileUpload({
-      fileURL,
-      modelLink: link,
-    });
+    try {
+      // ✅ For now, no upload — just pass data
+      await onFileUpload({
+        fileURL: null,
+        modelLink: link,
+      });
 
-    alert("Quote submitted ✅");
+      alert("Quote submitted ✅");
+
+    } catch (error) {
+      console.error("Quote error:", error);
+      alert("Something went wrong");
+    }
   };
 
   return (
     <div>
       <h2>Checkout</h2>
 
-      <p>Total: R{total}</p>
+      <p>Total: R0</p>
 
-      {/* ✅ ALWAYS SHOW FOR CUSTOM */}
-      <div>
+      {/* ✅ FILE INPUT */}
+      <div style={{ marginBottom: "10px" }}>
         <input
           type="file"
           onChange={(e) => setFile(e.target.files[0])}
         />
       </div>
 
-      <div>
+      {/* ✅ LINK INPUT */}
+      <div style={{ marginBottom: "10px" }}>
         <input
           type="text"
           placeholder="Paste model link"
@@ -72,25 +51,10 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ QUOTE */}
-      {total === 0 && (
-        <button onClick={handleQuote} disabled={loading}>
-          {loading ? "Uploading..." : "Request Quote"}
-        </button>
-      )}
-
-      {/* ✅ PAYMENT */}
-      {total > 0 && (
-        <form
-          action="https://sandbox.payfast.co.za/eng/process"
-          method="post"
-        >
-          <input type="hidden" name="amount" value={total} />
-          <input type="hidden" name="item_name" value="Order" />
-
-          <button type="submit">Pay Now</button>
-        </form>
-      )}
+      {/* ✅ BUTTON */}
+      <button onClick={handleQuote}>
+        Request Quote
+      </button>
     </div>
   );
 }
