@@ -72,7 +72,7 @@ export default function App() {
     }
   };
 
-  // ✅ Start checkout (save order BEFORE payment)
+  // ✅ Start checkout (create order first)
   const startCheckout = async () => {
     const ref = generateOrderRef();
     setOrderRef(ref);
@@ -92,21 +92,23 @@ export default function App() {
     }
   };
 
-  // ✅ Handle quote submission (for custom products)
-  const handleFileUpload = async ({ file, modelLink }) => {
+  // ✅ Handle file + link from Checkout
+  const handleFileUpload = async ({ fileURL, modelLink }) => {
     try {
       const snapshot = await getDocs(collection(db, "orders"));
       const lastOrder = snapshot.docs[snapshot.docs.length - 1];
 
       if (lastOrder) {
         await updateDoc(doc(db, "orders", lastOrder.id), {
+          fileURL: fileURL || null,
           modelLink: modelLink || null,
           status: "Quote Required",
         });
       }
 
       await loadOrders();
-      setView("orders");
+      setCart([]); // ✅ clear cart after submission
+      setView("orders"); // ✅ go to orders page
     } catch (error) {
       console.error("Error updating order:", error);
     }
@@ -140,7 +142,7 @@ export default function App() {
             cart={cart}
             total={total}
             removeItem={(i) =>
-              setCart(cart.filter((_, index) => index !== i))
+              setCart(cart.filter((_, idx) => idx !== i))
             }
             startCheckout={startCheckout}
           />
