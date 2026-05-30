@@ -11,51 +11,51 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const merchant_id = "10000100";
   const merchant_key = "46f0cd694581a";
 
+  // ✅ Replace with your actual deployed URL
   const return_url =
     "https://envision3d-website-jivechjaa-orders-6322s-projects.vercel.app";
   const cancel_url = return_url;
   const notify_url = return_url;
 
-  // ✅ Handle file upload
-  const handleUpload = async () => {
+  // ✅ Upload file to Firebase Storage
+  const uploadFile = async () => {
     if (!file) return null;
 
-    setLoading(true);
-
     try {
-      const storageRef = ref(storage, `models/${Date.now()}_${file.name}`);
+      setLoading(true);
+
+      const storageRef = ref(
+        storage,
+        `models/${Date.now()}_${file.name}`
+      );
+
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
       setLoading(false);
       return url;
     } catch (error) {
-      console.error("Upload error:", error);
+      console.error("Upload failed:", error);
       setLoading(false);
       return null;
     }
   };
 
-  // ✅ Handle submit (quote OR payment)
-  const handleSubmit = async (e) => {
-    if (total === 0) {
-      // Quote-based flow
-      e.preventDefault();
+  // ✅ Handle quote submission
+  const handleQuote = async () => {
+    const fileURL = await uploadFile();
 
-      const fileURL = await handleUpload();
-
-      if (!fileURL && !link) {
-        alert("Please upload a file or provide a link.");
-        return;
-      }
-
-      onFileUpload({
-        fileURL,
-        modelLink: link,
-      });
-
-      alert("✅ Request submitted! We will provide a quote.");
+    if (!fileURL && !link) {
+      alert("Please upload a file or provide a link.");
+      return;
     }
+
+    await onFileUpload({
+      fileURL: fileURL || null,
+      modelLink: link || null,
+    });
+
+    alert("✅ Quote request sent!");
   };
 
   return (
@@ -81,7 +81,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         <br />
         <input
           type="text"
-          placeholder="https://thingiverse.com/..."
+          placeholder="https://example.com/model"
           value={link}
           onChange={(e) => setLink(e.target.value)}
           style={{
@@ -92,23 +92,15 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* ✅ PAYMENT OR QUOTE */}
+      {/* ✅ PAYMENT OR QUOTE FLOW */}
       {total > 0 ? (
-        // ✅ PAYFAST FLOW
+        // ✅ PAYFAST FORM (FIXED — THIS REMOVES RED ❌)
         <form
           action="https://sandbox.payfast.co.za/eng/process"
           method="post"
         >
-          <input
-            type="hidden"
-            name="merchant_id"
-            value={merchant_id}
-          />
-          <input
-            type="hidden"
-            name="merchant_key"
-            value={merchant_key}
-          />
+          <input type="hidden" name="merchant_id" value={merchant_id} />
+          <input type="hidden" name="merchant_key" value={merchant_key} />
 
           <input type="hidden" name="return_url" value={return_url} />
           <input type="hidden" name="cancel_url" value={cancel_url} />
@@ -125,6 +117,20 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
             name="m_payment_id"
             value={orderRef}
           />
+
+          <div style={{ marginBottom: "10px" }}>
+            <input
+              type="email"
+              name="email_address"
+              placeholder="Enter your email"
+              required
+              style={{
+                padding: "10px",
+                width: "100%",
+                maxWidth: "300px",
+              }}
+            />
+          </div>
 
           <button
             type="submit"
@@ -143,7 +149,7 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       ) : (
         // ✅ QUOTE FLOW
         <button
-          onClick={handleSubmit}
+          onClick={handleQuote}
           disabled={loading}
           style={{
             padding: "12px",
@@ -160,4 +166,3 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
     </div>
   );
 }
-``
