@@ -26,7 +26,7 @@ export default function Orders({
             color: "#e5e7eb",
           }}
         >
-          <h3>{o.ref}</h3>
+          <h3>{o.ref || o.id}</h3>
 
           <p>
             <strong>Status:</strong> {o.status}
@@ -37,16 +37,7 @@ export default function Orders({
             {o.total > 0 ? `R${o.total}` : "Quote Required"}
           </p>
 
-          {/* ✅ FILE */}
-          {o.fileURL && (
-            <p>
-              <a href={o.fileURL} target="_blank" rel="noreferrer">
-                View Uploaded File
-              </a>
-            </p>
-          )}
-
-          {/* ✅ LINK */}
+          {/* ✅ MODEL LINK */}
           {o.modelLink && (
             <p>
               <a href={o.modelLink} target="_blank" rel="noreferrer">
@@ -55,9 +46,9 @@ export default function Orders({
             </p>
           )}
 
-          {/* ✅ SET PRICE (ONLY FOR QUOTES) */}
+          {/* ✅ SET PRICE */}
           {o.status === "Quote Required" && (
-            <div style={{ marginTop: "10px" }}>
+            <div>
               <input
                 type="number"
                 placeholder="Enter price"
@@ -74,14 +65,46 @@ export default function Orders({
                 onClick={() =>
                   setPrice(o.id, Number(priceInputs[o.id]))
                 }
-                style={{ marginLeft: "5px" }}
               >
                 Set Price
               </button>
             </div>
           )}
 
-          {/* ✅ ACTION BUTTONS */}
+          {/* ✅ PAYFAST BUTTON */}
+          {o.status === "Pending Payment" && (
+            <form
+              action="https://sandbox.payfast.co.za/eng/process"
+              method="post"
+            >
+              <input type="hidden" name="merchant_id" value="10000100" />
+              <input type="hidden" name="merchant_key" value="46f0cd694581a" />
+
+              <input
+                type="hidden"
+                name="amount"
+                value={o.total}
+              />
+
+              <input
+                type="hidden"
+                name="item_name"
+                value="Envision3D Order"
+              />
+
+              <input
+                type="hidden"
+                name="m_payment_id"
+                value={o.id}
+              />
+
+              <button type="submit">
+                Pay Now
+              </button>
+            </form>
+          )}
+
+          {/* ✅ ACTIONS */}
           <div style={{ marginTop: "10px" }}>
             <button onClick={() => updateStatus(o.id, "Paid")}>
               Paid
@@ -91,11 +114,12 @@ export default function Orders({
               Completed
             </button>
 
-            <button onClick={() => deleteOrder(o.id)}>Delete</button>
+            <button onClick={() => deleteOrder(o.id)}>
+              Delete
+            </button>
           </div>
         </div>
       ))}
     </div>
   );
 }
-``
