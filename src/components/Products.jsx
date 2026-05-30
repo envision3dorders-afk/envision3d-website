@@ -1,4 +1,4 @@
-export default function Products({ cart, setCart, search }) {
+export default function Products({ cart, setCart, search, setView }) {
   // ✅ PRODUCTS DATA
   const products = [
     {
@@ -26,7 +26,7 @@ export default function Products({ cart, setCart, search }) {
     },
   ];
 
-  // ✅ FILTER PRODUCTS
+  // ✅ FILTER
   const filteredProducts = products.filter((p) =>
     p.name.toLowerCase().includes(search.toLowerCase())
   );
@@ -47,7 +47,7 @@ export default function Products({ cart, setCart, search }) {
             color: "#e5e7eb",
           }}
         >
-          {/* ✅ IMAGE OR FALLBACK */}
+          {/* IMAGE */}
           {p.image ? (
             <img
               src={p.image}
@@ -84,19 +84,41 @@ export default function Products({ cart, setCart, search }) {
             </strong>
           </p>
 
-          <button
-            style={{
-              padding: "8px 12px",
-              borderRadius: "6px",
-              background: "#3b82f6",
-              color: "#fff",
-              border: "none",
-              cursor: "pointer",
-            }}
-            onClick={() => setCart([...cart, p])}
-          >
-            Add to Cart
-          </button>
+          {/* ✅ SMART BUTTON */}
+          {typeof p.price === "number" ? (
+            // ✅ Normal products
+            <button
+              onClick={() => setCart([...cart, p])}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                background: "#3b82f6",
+                color: "#fff",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Add to Cart
+            </button>
+          ) : (
+            // ✅ Custom product (quote)
+            <button
+              onClick={() => {
+                setCart([p]); // only custom item
+                setView("checkout"); // go straight to checkout
+              }}
+              style={{
+                padding: "8px 12px",
+                borderRadius: "6px",
+                background: "#f59e0b",
+                color: "#000",
+                border: "none",
+                cursor: "pointer",
+              }}
+            >
+              Request Quote
+            </button>
+          )}
         </div>
       ))}
     </>
