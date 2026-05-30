@@ -1,4 +1,13 @@
-export default function Orders({ orders, updateStatus, deleteOrder }) {
+import { useState } from "react";
+
+export default function Orders({
+  orders,
+  updateStatus,
+  deleteOrder,
+  setPrice,
+}) {
+  const [priceInputs, setPriceInputs] = useState({});
+
   return (
     <div>
       <h2>Orders</h2>
@@ -17,24 +26,10 @@ export default function Orders({ orders, updateStatus, deleteOrder }) {
             color: "#e5e7eb",
           }}
         >
-          {/* ✅ ORDER INFO */}
           <h3>{o.ref}</h3>
+
           <p>
-            <strong>Status:</strong>{" "}
-            <span
-              style={{
-                color:
-                  o.status === "Completed"
-                    ? "lightgreen"
-                    : o.status === "Paid"
-                    ? "#3b82f6"
-                    : o.status === "Pending Payment"
-                    ? "orange"
-                    : "#facc15",
-              }}
-            >
-              {o.status}
-            </span>
+            <strong>Status:</strong> {o.status}
           </p>
 
           <p>
@@ -42,89 +37,65 @@ export default function Orders({ orders, updateStatus, deleteOrder }) {
             {o.total > 0 ? `R${o.total}` : "Quote Required"}
           </p>
 
-          <p>
-            <strong>Date:</strong>{" "}
-            {o.date ? new Date(o.date).toLocaleString() : "N/A"}
-          </p>
-
-          {/* ✅ FILE LINK */}
+          {/* ✅ FILE */}
           {o.fileURL && (
             <p>
-              <strong>File:</strong>{" "}
-              <a
-                href={o.fileURL}
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: "#3b82f6" }}
-              >
+              <a href={o.fileURL} target="_blank" rel="noreferrer">
                 View Uploaded File
               </a>
             </p>
           )}
 
-          {/* ✅ MODEL LINK */}
+          {/* ✅ LINK */}
           {o.modelLink && (
             <p>
-              <strong>Model Link:</strong>{" "}
-              <a
-                href={o.modelLink}
-                target="_blank"
-                rel="noreferrer"
-                style={{ color: "#3b82f6" }}
-              >
-                Open Link
+              <a href={o.modelLink} target="_blank" rel="noreferrer">
+                View Model Link
               </a>
             </p>
           )}
 
+          {/* ✅ SET PRICE (ONLY FOR QUOTES) */}
+          {o.status === "Quote Required" && (
+            <div style={{ marginTop: "10px" }}>
+              <input
+                type="number"
+                placeholder="Enter price"
+                value={priceInputs[o.id] || ""}
+                onChange={(e) =>
+                  setPriceInputs({
+                    ...priceInputs,
+                    [o.id]: e.target.value,
+                  })
+                }
+              />
+
+              <button
+                onClick={() =>
+                  setPrice(o.id, Number(priceInputs[o.id]))
+                }
+                style={{ marginLeft: "5px" }}
+              >
+                Set Price
+              </button>
+            </div>
+          )}
+
           {/* ✅ ACTION BUTTONS */}
           <div style={{ marginTop: "10px" }}>
-            <button
-              onClick={() => updateStatus(o.id, "Paid")}
-              style={{
-                marginRight: "5px",
-                padding: "6px 10px",
-                borderRadius: "5px",
-                border: "none",
-                background: "#3b82f6",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              Mark Paid
+            <button onClick={() => updateStatus(o.id, "Paid")}>
+              Paid
             </button>
 
-            <button
-              onClick={() => updateStatus(o.id, "Completed")}
-              style={{
-                marginRight: "5px",
-                padding: "6px 10px",
-                borderRadius: "5px",
-                border: "none",
-                background: "green",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              Complete
+            <button onClick={() => updateStatus(o.id, "Completed")}>
+              Completed
             </button>
 
-            <button
-              onClick={() => deleteOrder(o.id)}
-              style={{
-                padding: "6px 10px",
-                borderRadius: "5px",
-                border: "none",
-                background: "red",
-                color: "#fff",
-                cursor: "pointer",
-              }}
-            >
-              Delete
-            </button>
+            <button onClick={() => deleteOrder(o.id)}>Delete</button>
           </div>
         </div>
       ))}
     </div>
   );
 }
+``
