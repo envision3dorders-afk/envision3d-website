@@ -15,7 +15,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
   const cancel_url = return_url;
   const notify_url = return_url;
 
-  // Upload file
   const uploadFile = async () => {
     if (!file) return null;
 
@@ -39,7 +38,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
     }
   };
 
-  // Quote logic
   const handleQuote = async () => {
     const fileURL = await uploadFile();
 
@@ -63,7 +61,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
       <p>Total: R{total}</p>
       <p>Reference: {orderRef}</p>
 
-      {/* FILE */}
       <div>
         <input
           type="file"
@@ -71,7 +68,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* LINK */}
       <div>
         <input
           type="text"
@@ -81,7 +77,6 @@ export default function Checkout({ total, orderRef, onFileUpload }) {
         />
       </div>
 
-      {/* PAYMENT OR QUOTE */}
       {total > 0 ? (
         <form
           action="https://sandbox.payfast.co.za/eng/process"
