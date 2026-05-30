@@ -77,16 +77,8 @@ export default function Orders({
               <input type="hidden" name="merchant_id" value="10000100" />
               <input type="hidden" name="merchant_key" value="46f0cd694581a" />
               <input type="hidden" name="amount" value={o.total} />
-              <input
-                type="hidden"
-                name="item_name"
-                value="Envision3D Custom Order"
-              />
-              <input
-                type="hidden"
-                name="m_payment_id"
-                value={o.id}
-              />
+              <input type="hidden" name="item_name" value="Envision3D Custom Order" />
+              <input type="hidden" name="m_payment_id" value={o.id} />
 
               <button type="submit">Pay Now</button>
             </form>
